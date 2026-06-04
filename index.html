@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pool Inspector Calculator — Camp Humphreys</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --surface2:  #1f2937;
+      --border:    #30363d;
+      --accent:    #00d4ff;
+      --accent2:   #0099bb;
+      --green:     #39d353;
+      --red:       #f85149;
+      --yellow:    #d29922;
+      --text:      #e6edf3;
+      --muted:     #7d8590;
+      --mono:      'Share Tech Mono', monospace;
+      --sans:      'Barlow', sans-serif;
+      --cond:      'Barlow Condensed', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--surface);
+      border-bottom: 2px solid var(--accent);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header .logo {
+      width: 38px; height: 38px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--cond);
+      font-size: 18px; font-weight: 700;
+      color: var(--bg);
+      flex-shrink: 0;
+    }
+    header h1 {
+      font-family: var(--cond);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+    header h1 span {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-family: var(--sans);
+    }
+    header .version {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── VENUE SELECTOR BAR ── */
+    .venue-bar {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .venue-bar label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    select {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-family: var(--sans);
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color .2s;
+      min-width: 180px;
+    }
+    select:focus { border-color: var(--accent); }
+
+    .venue-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      margin-left: auto;
+    }
+    .venue-badge .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .venue-badge.loaded .dot { background: var(--green); }
+    .venue-badge .vol {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-size: 13px;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .main {
+      display: flex;
+      height: calc(100vh - 114px);
+    }
+
+    /* ── SIDEBAR TABS ── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+    .tab-group-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 16px 4px;
+    }
+    .tab-btn {
+      width: 100%;
+      background: none;
+      border: none;
+      color: #4da6ff;
+      text-align: left;
+      padding: 9px 16px;
+      font-family: var(--sans);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      transition: all .15s;
+      border-left: 3px solid transparent;
+    }
+    .tab-btn:hover { color: var(--text); background: var(--surface2); }
+    .tab-btn.active {
+      color: var(--accent);
+      background: rgba(0,212,255,0.07);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+    .tab-btn .icon { font-size: 15px; width: 18px; text-align: center; }
+    .tab-btn .num {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 10px;
+      background: var(--surface2);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* ── CONTENT AREA ── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: var(--bg);
+    }
+
+    /* ── CALCULATOR PANELS ── */
+    .calc-panel { display: none; max-width: 680px; }
+    .calc-panel.active { display: block; }
+
+    .panel-header {
+      margin-bottom: 20px;
+    }
+    .panel-header h2 {
+      font-family: var(--cond);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: var(--text);
+    }
+    .panel-header p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+    .panel-header .ref {
+      display: inline-block;
+      margin-top: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent2);
+      background: rgba(0,153,187,0.1);
+      padding: 2px 8px;
+      border-radius: 3px;
+      border: 1px solid rgba(0,153,187,0.3);
+    }
+
+    /* ── FORM ELEMENTS ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .form-grid.single { grid-template-columns: 1fr; }
+    .form-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .field-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 9px 12px;
+      font-family: var(--mono);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input:focus { border-color: var(--accent); }
+    input.from-venue {
+      border-color: rgba(0,212,255,0.4);
+      background: rgba(0,212,255,0.04);
+    }
+    .unit-label {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      font-family: var(--mono);
+      min-width: 36px;
+    }
+
+    /* ── RADIO TOGGLE ── */
+    .radio-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .radio-group input { display: none; }
+    .radio-group label {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .radio-group input:checked + label {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    /* ── CALC BUTTON ── */
+    .calc-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 7px;
+      font-family: var(--cond);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .15s;
+      margin-bottom: 18px;
+    }
+    .calc-btn:hover { background: #00b8d9; transform: translateY(-1px); }
+    .calc-btn:active { transform: translateY(0); }
+
+    /* ── RESULT BOX ── */
+    .result-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: none;
+    }
+    .result-box.show { display: block; }
+    .result-box.pass { border-color: var(--green); background: rgba(57,211,83,0.05); }
+    .result-box.fail { border-color: var(--red); background: rgba(248,81,73,0.05); }
+    .result-box.warn { border-color: var(--yellow); background: rgba(210,153,34,0.05); }
+    .result-box.info { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+
+    .result-status {
+      font-family: var(--cond);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .result-box.pass .result-status { color: var(--green); }
+    .result-box.fail .result-status { color: var(--red); }
+    .result-box.warn .result-status { color: var(--yellow); }
+    .result-box.info .result-status { color: var(--accent); }
+
+    .result-main {
+      font-family: var(--mono);
+      font-size: 26px;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+    .result-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .result-sub strong { color: var(--text); }
+
+    .result-corrective {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--yellow);
+      line-height: 1.6;
+    }
+    .result-corrective::before {
+      content: "⚠ CORRECTIVE ACTION: ";
+      font-weight: 700;
+      font-family: var(--cond);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .sidebar { width: 54px; }
+      .tab-btn span:not(.icon) { display: none; }
+      .tab-btn .num { display: none; }
+      .tab-group-label { display: none; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid.triple { grid-template-columns: 1fr 1fr; }
+      .content { padding: 16px; }
+      .venue-bar { padding: 10px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">EH</div>
+  <h1>Pool Inspector Calc
+    <span>Camp Humphreys · Environmental Health</span>
+  </h1>
+  <div class="version">v1.0.0</div>
+</header>
+
+<!-- ── VENUE SELECTOR BAR ── -->
+<div class="venue-bar">
+  <label>Facility</label>
+  <select id="facilitySelect" onchange="onFacilityChange()">
+    <option value="">— Select Facility —</option>
+    <option value="__manual__">✏️ Manual Entry</option>
+  </select>
+
+  <label>Venue</label>
+  <select id="venueSelect" onchange="onVenueChange()" disabled>
+    <option value="">— Select Venue —</option>
+  </select>
+
+  <div class="venue-badge" id="venueBadge">
+    <div class="dot"></div>
+    <span id="badgeText">No venue selected</span>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="tab-group-label">Hydraulics</div>
+    <button class="tab-btn active" onclick="showTab('pool-volume')">
+      <span class="icon">📐</span><span>Pool Volume</span><span class="num">01</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('turnover')">
+      <span class="icon">🔄</span><span>Turnover Time</span><span class="num">02</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('min-flow')">
+      <span class="icon">💧</span><span>Min. Flow Rate</span><span class="num">03</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('dual-pump')">
+      <span class="icon">⚙️</span><span>Dual Pump Flow</span><span class="num">04</span>
+    </button>
+
+    <div class="tab-group-label">Water Chemistry</div>
+    <button class="tab-btn" onclick="showTab('bromine')">
+      <span class="icon">🧪</span><span>Bromine (TC→Br)</span><span class="num">05</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('breakpoint')">
+      <span class="icon">⚡</span><span>Breakpoint Cl₂</span><span class="num">06</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('cya')">
+      <span class="icon">☀️</span><span>Cyanuric Acid</span><span class="num">07</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('lsi')">
+      <span class="icon">⚖️</span><span>Langelier Index</span><span class="num">08</span>
+    </button>
+
+    <div class="tab-group-label">Spa</div>
+    <button class="tab-btn" onclick="showTab('spa-drain')">
+      <span class="icon">🛁</span><span>Spa Drain Interval</span><span class="num">09</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('spa-turnover')">
+      <span class="icon">♻️</span><span>Spa Turnover</span><span class="num">10</span>
+    </button>
+
+    <div class="tab-group-label">Bather Load</div>
+    <button class="tab-btn" onclick="showTab('bather')">
+      <span class="icon">🏊</span><span>Max Bather Load</span><span class="num">11</span>
+    </button>
+
+    <div class="tab-group-label">Filter System</div>
+    <button class="tab-btn" onclick="showTab('pressure-drop')">
+      <span class="icon">🔧</span><span>Pressure Drop</span><span class="num">12</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('filter-flow')">
+      <span class="icon">🌀</span><span>Filter Flow/Area</span><span class="num">13</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('pressure-conv')">
+      <span class="icon">📊</span><span>Pressure Converter</span><span class="num">14</span>
+    </button>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- 01 POOL VOLUME -->
+    <div class="calc-panel active" id="panel-pool-volume">
+      <div class="panel-header">
+        <h2>Pool Volume Calculator</h2>
+        <p>Calculate pool volume by shape. Result auto-fills venue selector fields.</p>
+      </div>
+      <div class="field" style="margin-bottom:14px">
+        <label>Pool Shape</label>
+        <div class="radio-group">
+          <input type="radio" name="shape" id="rect" value="rect" checked onchange="updateShapeFields()">
+          <label for="rect">Rectangular</label>
+          <input type="radio" name="shape" id="oval" value="oval" onchange="updateShapeFields()">
+          <label for="oval">Oval / Circular</label>
+          <input type="radio" name="shape" id="lshape" value="lshape" onchange="updateShapeFields()">
+          <label for="lshape">L-Shape</label>
+        </div>
+      </div>
+      <div class="form-grid" id="shapeFields">
+        <div class="field">
+          <label>Length (ft)</label>
+          <div class="field-row"><input type="number" id="vol_length" placeholder="e.g. 75"><span class="unit-label">ft</span></div>
+        </div>
+        <div class="field">
+          <label>Width (ft)</label>
+          <div class="field-row"><input type="number" id="vol_width" placeholder="e.g. 45"><span class="unit-label">ft</span></div>
+        </div>
+        <div class="field">
+          <label>Shallow End Depth (ft)</label>
+          <div class="field-row"><input type="number" id="vol_shallow" placeholder="e.g. 3.5"><span class="unit-label">ft</span></div>
+        </div>
+        <div class="field">
+          <label>Deep End Depth (ft)</label>
+          <div class="field-row"><input type="number" id="vol_deep" placeholder="e.g. 9"><span class="unit-label">ft</span></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcVolume()">CALCULATE VOLUME</button>
+      <div class="result-box info" id="res-volume">
+        <div class="result-status">Result</div>
+        <div class="result-main" id="res-volume-main"></div>
+        <div class="result-sub" id="res-volume-sub"></div>
+      </div>
+    </div>
+
+    <!-- 02 TURNOVER TIME -->
+    <div class="calc-panel" id="panel-turnover">
+      <div class="panel-header">
+        <h2>Turnover Time</h2>
+        <p>Calculates actual turnover time and compares to TB MED 575 required maximum.</p>
+        <span class="ref">TB MED 575 Table 2-2</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Pool Volume (gal)</label>
+          <div class="field-row"><input type="number" id="to_volume" placeholder="e.g. 150000" class="from-venue"><span class="unit-label">gal</span></div>
+        </div>
+        <div class="field">
+          <label>Flow Rate (GPM)</label>
+          <div class="field-row"><input type="number" id="to_flow" placeholder="e.g. 650"><span class="unit-label">GPM</span></div>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:14px">
+        <label>Venue Type</label>
+        <div class="radio-group">
+          <input type="radio" name="to_type" id="to_pool_s" value="pool_small" checked>
+          <label for="to_pool_s">Pool &lt;200k gal</label>
+          <input type="radio" name="to_type" id="to_pool_l" value="pool_large">
+          <label for="to_pool_l">Pool ≥200k gal</label>
+          <input type="radio" name="to_type" id="to_wading" value="wading">
+          <label for="to_wading">Wading Pool</label>
+          <input type="radio" name="to_type" id="to_therapy" value="therapy">
+          <label for="to_therapy">Therapy Pool</label>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcTurnover()">CALCULATE TURNOVER</button>
+      <div class="result-box" id="res-turnover">
+        <div class="result-status" id="res-turnover-status"></div>
+        <div class="result-main" id="res-turnover-main"></div>
+        <div class="result-sub" id="res-turnover-sub"></div>
+        <div class="result-corrective" id="res-turnover-corr" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- 03 MIN FLOW RATE -->
+    <div class="calc-panel" id="panel-min-flow">
+      <div class="panel-header">
+        <h2>Required Minimum Flow Rate</h2>
+        <p>Back-calculates the minimum GPM needed to meet TB MED 575 turnover requirements.</p>
+        <span class="ref">TB MED 575 Table 2-2</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Pool Volume (gal)</label>
+          <div class="field-row"><input type="number" id="mf_volume" placeholder="e.g. 150000" class="from-venue"><span class="unit-label">gal</span></div>
+        </div>
+        <div class="field">
+          <label>Venue Type</label>
+          <select id="mf_type" style="width:100%">
+            <option value="4">Pool &lt;200,000 gal (4 hr max)</option>
+            <option value="5">Pool ≥200,000 gal (5 hr max)</option>
+            <option value="0.5">Wading Pool (0.5 hr max)</option>
+            <option value="0.5">Therapy Pool (0.5 hr max)</option>
+            <option value="1">Catch/Plunge Pool (1 hr max)</option>
+            <option value="1">Water Slide (1 hr max)</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcMinFlow()">CALCULATE MIN FLOW</button>
+      <div class="result-box info" id="res-minflow">
+        <div class="result-status">Result</div>
+        <div class="result-main" id="res-minflow-main"></div>
+        <div class="result-sub" id="res-minflow-sub"></div>
+      </div>
+    </div>
+
+    <!-- 04 DUAL PUMP -->
+    <div class="calc-panel" id="panel-dual-pump">
+      <div class="panel-header">
+        <h2>Dual Pump Flow</h2>
+        <p>Combines two pump flow rates and calculates turnover. Also shows single-pump fallback turnover.</p>
+        <span class="ref">TB MED 575 §2-35</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Pool Volume (gal)</label>
+          <div class="field-row"><input type="number" id="dp_volume" placeholder="e.g. 150000" class="from-venue"><span class="unit-label">gal</span></div>
+        </div>
+        <div class="field">
+          <label>Max Turnover Time (hr)</label>
+          <div class="field-row"><input type="number" id="dp_max_to" placeholder="4" value="4"><span class="unit-label">hr</span></div>
+        </div>
+        <div class="field">
+          <label>Pump A Flow Rate</label>
+          <div class="field-row"><input type="number" id="dp_pump_a" placeholder="e.g. 350"><span class="unit-label">GPM</span></div>
+        </div>
+        <div class="field">
+          <label>Pump B Flow Rate</label>
+          <div class="field-row"><input type="number" id="dp_pump_b" placeholder="e.g. 300"><span class="unit-label">GPM</span></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcDualPump()">CALCULATE</button>
+      <div class="result-box" id="res-dualpump">
+        <div class="result-status" id="res-dp-status"></div>
+        <div class="result-main" id="res-dp-main"></div>
+        <div class="result-sub" id="res-dp-sub"></div>
+      </div>
+    </div>
+
+    <!-- 05 BROMINE -->
+    <div class="calc-panel" id="panel-bromine">
+      <div class="panel-header">
+        <h2>Bromine from Total Chlorine Reading</h2>
+        <p>Converts DPD Total Chlorine reading to Total Bromine. Pass/fail vs. TB MED 575 minimum.</p>
+        <span class="ref">TB MED 575 §2-29</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Total Chlorine Reading (DPD)</label>
+          <div class="field-row"><input type="number" id="br_tc" placeholder="e.g. 1.5" step="0.1"><span class="unit-label">mg/L</span></div>
+        </div>
+        <div class="field">
+          <label>Pool Location</label>
+          <select id="br_location" style="width:100%">
+            <option value="indoor">Indoor</option>
+            <option value="outdoor">Outdoor</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcBromine()">CALCULATE BROMINE</button>
+      <div class="result-box" id="res-bromine">
+        <div class="result-status" id="res-br-status"></div>
+        <div class="result-main" id="res-br-main"></div>
+        <div class="result-sub" id="res-br-sub"></div>
+        <div class="result-corrective" id="res-br-corr" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- 06 BREAKPOINT -->
+    <div class="calc-panel" id="panel-breakpoint">
+      <div class="panel-header">
+        <h2>Breakpoint Chlorination</h2>
+        <p>Calculates chlorine dose required to destroy combined chlorine (chloramines).</p>
+        <span class="ref">TB MED 575 §2-27</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Total Chlorine (mg/L)</label>
+          <div class="field-row"><input type="number" id="bp_tc" placeholder="e.g. 2.0" step="0.1"><span class="unit-label">mg/L</span></div>
+        </div>
+        <div class="field">
+          <label>Free Chlorine (mg/L)</label>
+          <div class="field-row"><input type="number" id="bp_fc" placeholder="e.g. 1.0" step="0.1"><span class="unit-label">mg/L</span></div>
+        </div>
+        <div class="field">
+          <label>Pool Volume (gal)</label>
+          <div class="field-row"><input type="number" id="bp_volume" placeholder="e.g. 150000" class="from-venue"><span class="unit-label">gal</span></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcBreakpoint()">CALCULATE DOSE</button>
+      <div class="result-box" id="res-breakpoint">
+        <div class="result-status" id="res-bp-status"></div>
+        <div class="result-main" id="res-bp-main"></div>
+        <div class="result-sub" id="res-bp-sub"></div>
+      </div>
+    </div>
+
+    <!-- 07 CYA -->
+    <div class="calc-panel" id="panel-cya">
+      <div class="panel-header">
+        <h2>Cyanuric Acid Check</h2>
+        <p>Checks CYA level against TB MED 575 limits. CYA only permitted in outdoor pools.</p>
+        <span class="ref">TB MED 575 §2-28</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>CYA Level (mg/L)</label>
+          <div class="field-row"><input type="number" id="cya_val" placeholder="e.g. 25"><span class="unit-label">mg/L</span></div>
+        </div>
+        <div class="field">
+          <label>Pool Type</label>
+          <select id="cya_type" style="width:100%">
+            <option value="outdoor_pool">Outdoor Pool</option>
+            <option value="indoor_pool">Indoor Pool</option>
+            <option value="spa">Spa</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Free Chlorine (mg/L) — if CYA used</label>
+          <div class="field-row"><input type="number" id="cya_fc" placeholder="e.g. 2.0" step="0.1"><span class="unit-label">mg/L</span></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcCYA()">CHECK CYA</button>
+      <div class="result-box" id="res-cya">
+        <div class="result-status" id="res-cya-status"></div>
+        <div class="result-main" id="res-cya-main"></div>
+        <div class="result-sub" id="res-cya-sub"></div>
+        <div class="result-corrective" id="res-cya-corr" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- 08 LSI -->
+    <div class="calc-panel" id="panel-lsi">
+      <div class="panel-header">
+        <h2>Langelier Saturation Index (LSI)</h2>
+        <p>Determines corrosive or scale-forming tendency of pool water. Target: –0.5 to +0.5.</p>
+        <span class="ref">TB MED 575 Appendix G</span>
+      </div>
+      <div class="form-grid triple">
+        <div class="field">
+          <label>pH</label>
+          <input type="number" id="lsi_ph" placeholder="7.4" step="0.1">
+        </div>
+        <div class="field">
+          <label>Temp (°F)</label>
+          <input type="number" id="lsi_temp" placeholder="84">
+        </div>
+        <div class="field">
+          <label>Ca Hardness (mg/L)</label>
+          <input type="number" id="lsi_ca" placeholder="200">
+        </div>
+        <div class="field">
+          <label>Total Alkalinity (mg/L)</label>
+          <input type="number" id="lsi_ta" placeholder="100">
+        </div>
+        <div class="field">
+          <label>TDS (mg/L) <span style="font-weight:400;color:var(--muted)">(opt.)</span></label>
+          <input type="number" id="lsi_tds" placeholder="1000">
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcLSI()">CALCULATE LSI</button>
+      <div class="result-box" id="res-lsi">
+        <div class="result-status" id="res-lsi-status"></div>
+        <div class="result-main" id="res-lsi-main"></div>
+        <div class="result-sub" id="res-lsi-sub"></div>
+        <div class="result-corrective" id="res-lsi-corr" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- 09 SPA DRAIN -->
+    <div class="calc-panel" id="panel-spa-drain">
+      <div class="panel-header">
+        <h2>Spa Drain Interval</h2>
+        <p>Calculates required maximum days between full spa drains based on bather load.</p>
+        <span class="ref">MAHC §5.7.3</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Spa Volume (gal)</label>
+          <div class="field-row"><input type="number" id="sd_volume" placeholder="e.g. 1200" class="from-venue"><span class="unit-label">gal</span></div>
+        </div>
+        <div class="field">
+          <label>Avg Daily Bathers</label>
+          <div class="field-row"><input type="number" id="sd_bathers" placeholder="e.g. 15"><span class="unit-label">ppl</span></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcSpaDrain()">CALCULATE DRAIN INTERVAL</button>
+      <div class="result-box info" id="res-spadrain">
+        <div class="result-status">Result</div>
+        <div class="result-main" id="res-sd-main"></div>
+        <div class="result-sub" id="res-sd-sub"></div>
+      </div>
+    </div>
+
+    <!-- 10 SPA TURNOVER -->
+    <div class="calc-panel" id="panel-spa-turnover">
+      <div class="panel-header">
+        <h2>Spa Turnover Time</h2>
+        <p>Checks spa turnover against TB MED 575 standard: &lt;10,000 gal = 15 min max; ≥10,000 gal = 30 min max.</p>
+        <span class="ref">TB MED 575 Table 2-2</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Spa Volume (gal)</label>
+          <div class="field-row"><input type="number" id="st_volume" placeholder="e.g. 1200" class="from-venue"><span class="unit-label">gal</span></div>
+        </div>
+        <div class="field">
+          <label>Flow Rate (GPM)</label>
+          <div class="field-row"><input type="number" id="st_flow" placeholder="e.g. 80"><span class="unit-label">GPM</span></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcSpaTurnover()">CALCULATE</button>
+      <div class="result-box" id="res-spaturnover">
+        <div class="result-status" id="res-st-status"></div>
+        <div class="result-main" id="res-st-main"></div>
+        <div class="result-sub" id="res-st-sub"></div>
+        <div class="result-corrective" id="res-st-corr" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- 11 BATHER LOAD -->
+    <div class="calc-panel" id="panel-bather">
+      <div class="panel-header">
+        <h2>Maximum Bather Load</h2>
+        <p>Calculates maximum allowable bathers based on pool surface area.</p>
+        <span class="ref">TB MED 575 §2-16</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Shallow Area (ft²) <span style="font-weight:400;color:var(--muted)">≤5ft depth</span></label>
+          <div class="field-row"><input type="number" id="bl_shallow" placeholder="e.g. 2000"><span class="unit-label">ft²</span></div>
+        </div>
+        <div class="field">
+          <label>Deep Area (ft²) <span style="font-weight:400;color:var(--muted)">&gt;5ft depth</span></label>
+          <div class="field-row"><input type="number" id="bl_deep" placeholder="e.g. 1200"><span class="unit-label">ft²</span></div>
+        </div>
+        <div class="field">
+          <label>Observed Bathers (current)</label>
+          <div class="field-row"><input type="number" id="bl_observed" placeholder="e.g. 45"><span class="unit-label">ppl</span></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcBatherLoad()">CALCULATE</button>
+      <div class="result-box" id="res-bather">
+        <div class="result-status" id="res-bl-status"></div>
+        <div class="result-main" id="res-bl-main"></div>
+        <div class="result-sub" id="res-bl-sub"></div>
+        <div class="result-corrective" id="res-bl-corr" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- 12 PRESSURE DROP -->
+    <div class="calc-panel" id="panel-pressure-drop">
+      <div class="panel-header">
+        <h2>Filter Pressure Drop</h2>
+        <p>Calculates differential pressure across the filter. High ΔP indicates backwash needed.</p>
+        <span class="ref">MAHC §4.7.2</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Influent Pressure (psi)</label>
+          <div class="field-row"><input type="number" id="pd_influent" placeholder="e.g. 25" step="0.1"><span class="unit-label">psi</span></div>
+        </div>
+        <div class="field">
+          <label>Effluent Pressure (psi)</label>
+          <div class="field-row"><input type="number" id="pd_effluent" placeholder="e.g. 15" step="0.1"><span class="unit-label">psi</span></div>
+        </div>
+        <div class="field">
+          <label>Clean Filter Baseline ΔP (psi) <span style="color:var(--muted);font-weight:400">(opt.)</span></label>
+          <div class="field-row"><input type="number" id="pd_baseline" placeholder="e.g. 7" step="0.1"><span class="unit-label">psi</span></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcPressureDrop()">CALCULATE ΔP</button>
+      <div class="result-box" id="res-pressuredrop">
+        <div class="result-status" id="res-pd-status"></div>
+        <div class="result-main" id="res-pd-main"></div>
+        <div class="result-sub" id="res-pd-sub"></div>
+        <div class="result-corrective" id="res-pd-corr" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- 13 FILTER FLOW/AREA -->
+    <div class="calc-panel" id="panel-filter-flow">
+      <div class="calc-panel active" id="panel-filter-flow-inner">
+      <div class="panel-header">
+        <h2>Filter Flow Rate per Area</h2>
+        <p>Checks hydraulic loading rate against filter manufacturer / MAHC limits.</p>
+        <span class="ref">MAHC §4.7.2.2</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Flow Rate (GPM)</label>
+          <div class="field-row"><input type="number" id="ff_flow" placeholder="e.g. 650"><span class="unit-label">GPM</span></div>
+        </div>
+        <div class="field">
+          <label>Filter Surface Area (ft²)</label>
+          <div class="field-row"><input type="number" id="ff_area" placeholder="e.g. 120" step="0.1"><span class="unit-label">ft²</span></div>
+        </div>
+        <div class="field">
+          <label>Filter Type</label>
+          <select id="ff_type" style="width:100%">
+            <option value="15">Sand (max 15 GPM/ft²)</option>
+            <option value="20">High-Rate Sand (max 20 GPM/ft²)</option>
+            <option value="2">DE Filter (max 2 GPM/ft²)</option>
+            <option value="custom">Custom limit</option>
+          </select>
+        </div>
+        <div class="field" id="ff_custom_field" style="display:none">
+          <label>Custom Max (GPM/ft²)</label>
+          <div class="field-row"><input type="number" id="ff_custom" placeholder="e.g. 18"><span class="unit-label">GPM/ft²</span></div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcFilterFlow()">CALCULATE</button>
+      <div class="result-box" id="res-filterflow">
+        <div class="result-status" id="res-ff-status"></div>
+        <div class="result-main" id="res-ff-main"></div>
+        <div class="result-sub" id="res-ff-sub"></div>
+        <div class="result-corrective" id="res-ff-corr" style="display:none"></div>
+      </div>
+      </div>
+    </div>
+
+    <!-- 14 PRESSURE CONVERTER -->
+    <div class="calc-panel" id="panel-pressure-conv">
+      <div class="panel-header">
+        <h2>Pressure Unit Converter</h2>
+        <p>Convert MPa or bar gauge readings to psi. Useful for Neptune-Benson and other metric-display gauges.</p>
+        <span class="ref">MAHC §4.7.2.2.5</span>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Input Value</label>
+          <div class="field-row"><input type="number" id="pc_value" placeholder="e.g. 0.15" step="0.001"></div>
+        </div>
+        <div class="field">
+          <label>From Unit</label>
+          <div class="radio-group">
+            <input type="radio" name="pc_unit" id="pc_mpa" value="mpa" checked>
+            <label for="pc_mpa">MPa</label>
+            <input type="radio" name="pc_unit" id="pc_bar" value="bar">
+            <label for="pc_bar">bar</label>
+            <input type="radio" name="pc_unit" id="pc_kpa" value="kpa">
+            <label for="pc_kpa">kPa</label>
+          </div>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcPressureConv()">CONVERT TO PSI</button>
+      <div class="result-box info" id="res-pressureconv">
+        <div class="result-status">Result</div>
+        <div class="result-main" id="res-pc-main"></div>
+        <div class="result-sub" id="res-pc-sub"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ══════════════════════════════════════════
+// DATA LAYER — Load from JSON
+// ══════════════════════════════════════════
+let facilities = [];
+let currentVenue = null;
+
+async function loadFacilities() {
+  try {
+    const res = await fetch('./data/facilities.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    facilities = data.facilities || [];
+    populateFacilitySelect();
+  } catch(e) {
+    // JSON load fails on local file:// protocol — calculators still work fine
+    console.warn('facilities.json not loaded (Manual Entry only):', e.message);
+  }
+}
+
+function populateFacilitySelect() {
+  const sel = document.getElementById('facilitySelect');
+  // Insert after the two existing static options (blank + manual)
+  facilities.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f.id;
+    opt.textContent = f.name;
+    sel.appendChild(opt);
+  });
+}
+
+function onFacilityChange() {
+  const facilityId = document.getElementById('facilitySelect').value;
+  const venueSel = document.getElementById('venueSelect');
+  venueSel.innerHTML = '<option value="">— Select Venue —</option>';
+  currentVenue = null;
+  updateBadge();
+
+  if (!facilityId) { venueSel.disabled = true; return; }
+
+  // ── MANUAL ENTRY MODE ──
+  if (facilityId === '__manual__') {
+    ['manual_pool','manual_spa','manual_wading'].forEach((id, i) => {
+      const labels = ['🏊 Pool (Manual)','🛁 Spa (Manual)','🏖 Wading Pool (Manual)'];
+      const types  = ['pool','spa','wading_pool'];
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = labels[i];
+      opt.dataset.type = types[i];
+      venueSel.appendChild(opt);
+    });
+    venueSel.disabled = false;
+    return;
+  }
+
+  const facility = facilities.find(f => f.id === facilityId);
+  if (!facility) return;
+
+  facility.venues.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v.id;
+    const typeLabel = v.type === 'spa' ? '🛁' : v.type === 'wading_pool' ? '🏖' : '🏊';
+    opt.textContent = `${typeLabel} ${v.name}`;
+    venueSel.appendChild(opt);
+  });
+  venueSel.disabled = false;
+}
+
+function onVenueChange() {
+  const facilityId = document.getElementById('facilitySelect').value;
+  const venueId = document.getElementById('venueSelect').value;
+  if (!venueId) { currentVenue = null; updateBadge(); return; }
+
+  // ── MANUAL ENTRY MODE ──
+  if (facilityId === '__manual__') {
+    const typeMap = { manual_pool:'pool', manual_spa:'spa', manual_wading:'wading_pool' };
+    currentVenue = {
+      id: venueId,
+      name: 'Manual Entry',
+      type: typeMap[venueId],
+      location: 'unknown',
+      volume_gal: 0,
+      pump_count: 1,
+      manual: true
+    };
+    updateBadge();
+    clearVolumeFields();
+    return;
+  }
+
+  const facility = facilities.find(f => f.id === facilityId);
+  currentVenue = facility?.venues.find(v => v.id === venueId) || null;
+  updateBadge();
+  fillVolumeFields();
+}
+
+function clearVolumeFields() {
+  ['to_volume','mf_volume','dp_volume','bp_volume','sd_volume','st_volume'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.placeholder = 'Enter manually'; }
+  });
+}
+
+function updateBadge() {
+  const badge = document.getElementById('venueBadge');
+  const text = document.getElementById('badgeText');
+  if (!currentVenue) {
+    badge.className = 'venue-badge';
+    text.innerHTML = 'No venue selected';
+    return;
+  }
+  if (currentVenue.manual) {
+    badge.className = 'venue-badge loaded';
+    const typeLabel = currentVenue.type === 'spa' ? '🛁 Spa' : currentVenue.type === 'wading_pool' ? '🏖 Wading Pool' : '🏊 Pool';
+    text.innerHTML = `${typeLabel} &nbsp;·&nbsp; <span style="color:var(--yellow)">Manual Entry</span>`;
+    return;
+  }
+  badge.className = 'venue-badge loaded';
+  const vol = currentVenue.volume_gal > 0
+    ? `<span class="vol">${currentVenue.volume_gal.toLocaleString()} gal</span>`
+    : `<span style="color:var(--yellow)">Volume TBD</span>`;
+  text.innerHTML = `${currentVenue.name} &nbsp;·&nbsp; ${vol}`;
+}
+
+function fillVolumeFields() {
+  if (!currentVenue || currentVenue.volume_gal === 0) return;
+  const vol = currentVenue.volume_gal;
+  ['to_volume','mf_volume','dp_volume','bp_volume','sd_volume','st_volume'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = vol;
+  });
+}
+
+// ══════════════════════════════════════════
+// UI — TAB SWITCHING
+// ══════════════════════════════════════════
+function showTab(id) {
+  document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id)?.classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+function showResult(id, type, status, main, sub, corr) {
+  const box = document.getElementById('res-' + id);
+  if (!box) return;
+  box.className = 'result-box show ' + type;
+  const statusEl = document.getElementById('res-' + id + '-status');
+  if (statusEl) statusEl.textContent = status;
+  const mainEl = document.getElementById('res-' + id + '-main');
+  if (mainEl) mainEl.textContent = main;
+  const subEl = document.getElementById('res-' + id + '-sub');
+  if (subEl) subEl.innerHTML = sub;
+  const corrEl = document.getElementById('res-' + id + '-corr');
+  if (corrEl) { corrEl.style.display = corr ? 'block' : 'none'; corrEl.textContent = corr || ''; }
+}
+
+// Langelier lookup tables
+const TF_TABLE = [[0,0],[3,0.1],[8,0.2],[12,0.3],[16,0.4],[19,0.5],[24,0.6],[29,0.7],[34,0.8],[40,0.8],[53,1.0]];
+const CF_TABLE = [[5,0.3],[25,1.0],[50,1.3],[75,1.5],[100,1.6],[150,1.8],[200,1.9],[300,2.1],[400,2.2],[800,2.5],[1000,2.6]];
+const AF_TABLE = [[5,0.7],[25,1.4],[50,1.7],[75,1.9],[100,2.0],[150,2.2],[200,2.3],[300,2.5],[400,2.6],[800,2.9],[1000,3.0]];
+
+function lookupFactor(table, val) {
+  for (let i = table.length - 1; i >= 0; i--) {
+    if (val >= table[i][0]) return table[i][1];
+  }
+  return table[0][1];
+}
+
+function fToC(f) { return (f - 32) * 5/9; }
+
+// ══════════════════════════════════════════
+// CALCULATORS
+// ══════════════════════════════════════════
+
+// 01 Pool Volume
+function updateShapeFields() {
+  const shape = document.querySelector('input[name="shape"]:checked').value;
+  const grid = document.getElementById('shapeFields');
+  if (shape === 'rect') {
+    grid.innerHTML = `
+      <div class="field"><label>Length (ft)</label><div class="field-row"><input type="number" id="vol_length" placeholder="e.g. 75"><span class="unit-label">ft</span></div></div>
+      <div class="field"><label>Width (ft)</label><div class="field-row"><input type="number" id="vol_width" placeholder="e.g. 45"><span class="unit-label">ft</span></div></div>
+      <div class="field"><label>Shallow End Depth (ft)</label><div class="field-row"><input type="number" id="vol_shallow" placeholder="e.g. 3.5"><span class="unit-label">ft</span></div></div>
+      <div class="field"><label>Deep End Depth (ft)</label><div class="field-row"><input type="number" id="vol_deep" placeholder="e.g. 9"><span class="unit-label">ft</span></div></div>`;
+  } else if (shape === 'oval') {
+    grid.innerHTML = `
+      <div class="field"><label>Length / Diameter (ft)</label><div class="field-row"><input type="number" id="vol_length" placeholder="e.g. 50"><span class="unit-label">ft</span></div></div>
+      <div class="field"><label>Width (ft) — oval only</label><div class="field-row"><input type="number" id="vol_width" placeholder="e.g. 25"><span class="unit-label">ft</span></div></div>
+      <div class="field"><label>Average Depth (ft)</label><div class="field-row"><input type="number" id="vol_avg" placeholder="e.g. 5"><span class="unit-label">ft</span></div></div>`;
+  } else {
+    grid.innerHTML = `
+      <div class="field"><label>Section A — Length (ft)</label><div class="field-row"><input type="number" id="vol_a_l" placeholder="e.g. 60"><span class="unit-label">ft</span></div></div>
+      <div class="field"><label>Section A — Width (ft)</label><div class="field-row"><input type="number" id="vol_a_w" placeholder="e.g. 30"><span class="unit-label">ft</span></div></div>
+      <div class="field"><label>Section B — Length (ft)</label><div class="field-row"><input type="number" id="vol_b_l" placeholder="e.g. 40"><span class="unit-label">ft</span></div></div>
+      <div class="field"><label>Section B — Width (ft)</label><div class="field-row"><input type="number" id="vol_b_w" placeholder="e.g. 20"><span class="unit-label">ft</span></div></div>
+      <div class="field"><label>Average Depth (ft)</label><div class="field-row"><input type="number" id="vol_avg" placeholder="e.g. 4"><span class="unit-label">ft</span></div></div>`;
+  }
+}
+
+function calcVolume() {
+  const shape = document.querySelector('input[name="shape"]:checked').value;
+  let gal = 0;
+  if (shape === 'rect') {
+    const L = +document.getElementById('vol_length')?.value;
+    const W = +document.getElementById('vol_width')?.value;
+    const S = +document.getElementById('vol_shallow')?.value;
+    const D = +document.getElementById('vol_deep')?.value;
+    if (!L||!W||!S||!D) return alert('Please fill all fields.');
+    const avgDepth = (S + D) / 2;
+    gal = L * W * avgDepth * 7.48;
+  } else if (shape === 'oval') {
+    const L = +document.getElementById('vol_length')?.value;
+    const W = +document.getElementById('vol_width')?.value || L;
+    const A = +document.getElementById('vol_avg')?.value;
+    if (!L||!A) return alert('Please fill all fields.');
+    gal = Math.PI * (L/2) * (W/2) * A * 7.48;
+  } else {
+    const aL = +document.getElementById('vol_a_l')?.value;
+    const aW = +document.getElementById('vol_a_w')?.value;
+    const bL = +document.getElementById('vol_b_l')?.value;
+    const bW = +document.getElementById('vol_b_w')?.value;
+    const avg = +document.getElementById('vol_avg')?.value;
+    if (!aL||!aW||!bL||!bW||!avg) return alert('Please fill all fields.');
+    gal = (aL*aW + bL*bW) * avg * 7.48;
+  }
+  const box = document.getElementById('res-volume');
+  box.className = 'result-box show info';
+  document.getElementById('res-volume-main').textContent = `${Math.round(gal).toLocaleString()} gallons`;
+  document.getElementById('res-volume-sub').innerHTML =
+    `≈ <strong>${(gal*3.785).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')} liters</strong> &nbsp;·&nbsp; Use this value in turnover / flow rate calculators.`;
+}
+
+// 02 Turnover
+const TURNOVER_MAX = { pool_small:4, pool_large:5, wading:0.5, therapy:0.5, catch:1, slide:1, spray:0.17, action_s:1, action_l:1.5, wave_s:1.5, wave_l:2 };
+function calcTurnover() {
+  const vol = +document.getElementById('to_volume').value;
+  const flow = +document.getElementById('to_flow').value;
+  const type = document.querySelector('input[name="to_type"]:checked').value;
+  if (!vol||!flow) return alert('Please fill all fields.');
+  const actual = vol / flow / 60;
+  const max = TURNOVER_MAX[type];
+  const pass = actual <= max;
+  showResult('turnover',
+    pass ? 'pass' : 'fail',
+    pass ? '✓ PASS' : '✗ FAIL',
+    `${actual.toFixed(2)} hours`,
+    `Required max: <strong>${max} hr</strong> &nbsp;·&nbsp; Flow: <strong>${flow} GPM</strong> &nbsp;·&nbsp; Volume: <strong>${vol.toLocaleString()} gal</strong>`,
+    pass ? null : `Increase flow rate to at least ${Math.ceil(vol/max/60)} GPM to achieve ${max}-hour turnover.`
+  );
+}
+
+// 03 Min Flow Rate
+function calcMinFlow() {
+  const vol = +document.getElementById('mf_volume').value;
+  const maxHr = +document.getElementById('mf_type').value;
+  if (!vol) return alert('Please enter pool volume.');
+  const minGPM = Math.ceil(vol / maxHr / 60);
+  const box = document.getElementById('res-minflow');
+  box.className = 'result-box show info';
+  document.getElementById('res-minflow-main').textContent = `${minGPM.toLocaleString()} GPM minimum`;
+  document.getElementById('res-minflow-sub').innerHTML =
+    `To achieve <strong>${maxHr}-hour</strong> maximum turnover for <strong>${vol.toLocaleString()} gal</strong>.`;
+}
+
+// 04 Dual Pump
+function calcDualPump() {
+  const vol = +document.getElementById('dp_volume').value;
+  const maxTo = +document.getElementById('dp_max_to').value || 4;
+  const pA = +document.getElementById('dp_pump_a').value;
+  const pB = +document.getElementById('dp_pump_b').value;
+  if (!vol||!pA||!pB) return alert('Please fill all fields.');
+  const combined = pA + pB;
+  const toCombined = vol / combined / 60;
+  const toA = vol / pA / 60;
+  const toB = vol / pB / 60;
+  const pass = toCombined <= maxTo;
+  showResult('dualpump',
+    pass ? 'pass' : 'fail',
+    pass ? '✓ COMBINED PASS' : '✗ COMBINED FAIL',
+    `${toCombined.toFixed(2)} hr (combined)`,
+    `Pump A: <strong>${pA} GPM</strong> → ${toA.toFixed(2)} hr alone<br>
+     Pump B: <strong>${pB} GPM</strong> → ${toB.toFixed(2)} hr alone<br>
+     Combined: <strong>${combined} GPM</strong> &nbsp;·&nbsp; Required max: <strong>${maxTo} hr</strong>`,
+    pass ? null : null
+  );
+}
+
+// 05 Bromine
+function calcBromine() {
+  const tc = +document.getElementById('br_tc').value;
+  const loc = document.getElementById('br_location').value;
+  if (!tc) return alert('Please enter TC reading.');
+  if (loc === 'outdoor') {
+    showResult('bromine','fail','✗ NOT PERMITTED',
+      'Bromine — Outdoor Use',
+      'TB MED 575 §2-29: Bromine is rapidly displaced by sunlight and is <strong>not permitted</strong> in outdoor facilities.',
+      'Use chlorine for outdoor pools. Bromine is only approved for indoor pools and spas.');
+    return;
+  }
+  const br = tc * 2.25;
+  const pass = br >= 3.0;
+  showResult('bromine',
+    pass ? 'pass' : 'fail',
+    pass ? '✓ PASS' : '✗ FAIL',
+    `${br.toFixed(2)} mg/L Total Bromine`,
+    `TC reading: <strong>${tc} mg/L</strong> × 2.25 = <strong>${br.toFixed(2)} mg/L Br</strong><br>
+     Required minimum: <strong>3.0 mg/L</strong>`,
+    pass ? null : `Increase bromine feed. Current: ${br.toFixed(2)} mg/L — Deficit: ${(3.0 - br).toFixed(2)} mg/L below minimum.`
+  );
+}
+
+// 06 Breakpoint
+function calcBreakpoint() {
+  const tc = +document.getElementById('bp_tc').value;
+  const fc = +document.getElementById('bp_fc').value;
+  const vol = +document.getElementById('bp_volume').value;
+  if (!tc||!fc) return alert('Please fill TC and FC fields.');
+  const cc = tc - fc;
+  if (cc < 0) { alert('TC cannot be less than FC.'); return; }
+  const doseNeeded = cc * 10; // mg/L chlorine needed
+  const box = document.getElementById('res-breakpoint');
+  box.className = 'result-box show ' + (cc > 0.2 ? 'fail' : 'pass');
+  document.getElementById('res-bp-status').textContent = cc > 0.2 ? '⚠ CHLORAMINES DETECTED' : '✓ WITHIN LIMIT';
+  document.getElementById('res-bp-main').textContent = `Add ${doseNeeded.toFixed(1)} mg/L Cl₂`;
+  let sub = `Combined Chlorine: <strong>${cc.toFixed(2)} mg/L</strong><br>Breakpoint dose needed: <strong>${doseNeeded.toFixed(1)} mg/L</strong>`;
+  if (vol) {
+    const lbs = (doseNeeded * vol * 8.34) / 1000000;
+    sub += `<br>For ${vol.toLocaleString()} gal pool: ≈ <strong>${lbs.toFixed(2)} lbs</strong> of 100% Cl₂ equivalent`;
+  }
+  document.getElementById('res-bp-sub').innerHTML = sub;
+}
+
+// 07 CYA
+function calcCYA() {
+  const val = +document.getElementById('cya_val').value;
+  const type = document.getElementById('cya_type').value;
+  const fc = +document.getElementById('cya_fc').value;
+  if (val === '' || isNaN(val)) return alert('Please enter CYA level.');
+
+  if (type === 'indoor_pool' || type === 'spa') {
+    showResult('cya','fail','✗ NOT PERMITTED',
+      `CYA in ${type === 'spa' ? 'Spa' : 'Indoor Pool'}`,
+      'TB MED 575 §2-28(e): <strong>Cyanuric acid and stabilized chlorines may not be used in spas or indoor pools.</strong>',
+      'Discontinue CYA use immediately. Drain and refill if CYA is present in indoor pool or spa.');
+    return;
+  }
+  // Outdoor pool
+  let statusType, statusText, corrText = null;
+  if (val >= 50) {
+    statusType = 'fail'; statusText = '✗ FAIL — EXCEEDS LIMIT';
+    corrText = `CYA at ${val} mg/L exceeds absolute maximum of 50 mg/L. Partial drain and refill required to dilute CYA level.`;
+  } else if (val > 30) {
+    statusType = 'warn'; statusText = '⚠ WARNING — ABOVE RECOMMENDED';
+    corrText = `CYA at ${val} mg/L exceeds recommended max of 30 mg/L. Monitor closely; consider partial drain/refill.`;
+  } else {
+    statusType = 'pass'; statusText = '✓ PASS';
+  }
+  let sub = `CYA: <strong>${val} mg/L</strong> &nbsp;·&nbsp; Recommended max: <strong>30 mg/L</strong> &nbsp;·&nbsp; Absolute max: <strong>50 mg/L</strong>`;
+  if (fc) {
+    const fcPass = fc >= 2.0;
+    sub += `<br>Free Chlorine with CYA: <strong>${fc} mg/L</strong> — Required min with CYA: 2.0 mg/L — ${fcPass ? '<span style="color:var(--green)">OK</span>' : '<span style="color:var(--red)">INSUFFICIENT</span>'}`;
+  }
+  const box = document.getElementById('res-cya');
+  box.className = 'result-box show ' + statusType;
+  document.getElementById('res-cya-status').textContent = statusText;
+  document.getElementById('res-cya-main').textContent = `${val} mg/L CYA`;
+  document.getElementById('res-cya-sub').innerHTML = sub;
+  const corrEl = document.getElementById('res-cya-corr');
+  corrEl.style.display = corrText ? 'block' : 'none';
+  corrEl.textContent = corrText || '';
+}
+
+// 08 LSI
+function calcLSI() {
+  const ph = +document.getElementById('lsi_ph').value;
+  const tempF = +document.getElementById('lsi_temp').value;
+  const ca = +document.getElementById('lsi_ca').value;
+  const ta = +document.getElementById('lsi_ta').value;
+  if (!ph||!tempF||!ca||!ta) return alert('Please fill pH, Temp, Ca Hardness, and Total Alkalinity.');
+  const tempC = fToC(tempF);
+  const tf = lookupFactor(TF_TABLE, tempC);
+  const cf = lookupFactor(CF_TABLE, ca);
+  const af = lookupFactor(AF_TABLE, ta);
+  const tds = +document.getElementById('lsi_tds').value || 1000;
+  const tdsf = tds > 1000 ? 0.1 : 0;
+  const lsi = ph + tf + cf + af - 12.1 - tdsf;
+  let type, status, corr = null;
+  if (lsi < -0.5) { type='fail'; status='✗ CORROSIVE'; corr='Add sodium bicarbonate to raise alkalinity. Add calcium chloride to raise hardness. Adjust pH upward toward 7.4–7.6.'; }
+  else if (lsi > 0.5) { type='fail'; status='✗ SCALE-FORMING'; corr='Lower pH using muriatic acid or sodium bisulfate. Reduce total alkalinity. Consider partial drain if calcium hardness is very high.'; }
+  else if (lsi < -0.3) { type='warn'; status='⚠ SLIGHTLY CORROSIVE'; }
+  else if (lsi > 0.3) { type='warn'; status='⚠ SLIGHT SCALE TENDENCY'; }
+  else { type='pass'; status='✓ BALANCED'; }
+  showResult('lsi', type, status,
+    `LSI = ${lsi.toFixed(2)}`,
+    `pH: <strong>${ph}</strong> + TF: <strong>${tf}</strong> + CF: <strong>${cf}</strong> + AF: <strong>${af}</strong> − 12.1<br>
+     Temp: <strong>${tempF}°F (${tempC.toFixed(1)}°C)</strong> &nbsp;·&nbsp; Ca: <strong>${ca} mg/L</strong> &nbsp;·&nbsp; TA: <strong>${ta} mg/L</strong><br>
+     Acceptable range: <strong>–0.5 to +0.5</strong>`,
+    corr
+  );
+}
+
+// 09 Spa Drain
+function calcSpaDrain() {
+  const vol = +document.getElementById('sd_volume').value;
+  const bathers = +document.getElementById('sd_bathers').value;
+  if (!vol||!bathers) return alert('Please fill all fields.');
+  const days = vol / 3 / bathers;
+  const box = document.getElementById('res-spadrain');
+  box.className = 'result-box show info';
+  document.getElementById('res-sd-main').textContent = `Drain every ${days.toFixed(1)} days`;
+  document.getElementById('res-sd-sub').innerHTML =
+    `Formula: ${vol.toLocaleString()} gal ÷ 3 ÷ ${bathers} bathers/day<br>
+     Maximum interval: <strong>${days.toFixed(1)} days</strong> between full drains &amp; refills.`;
+}
+
+// 10 Spa Turnover
+function calcSpaTurnover() {
+  const vol = +document.getElementById('st_volume').value;
+  const flow = +document.getElementById('st_flow').value;
+  if (!vol||!flow) return alert('Please fill all fields.');
+  const actualMin = vol / flow;
+  const maxMin = vol < 10000 ? 15 : 30;
+  const pass = actualMin <= maxMin;
+  showResult('spaturnover',
+    pass ? 'pass' : 'fail',
+    pass ? '✓ PASS' : '✗ FAIL',
+    `${actualMin.toFixed(1)} min`,
+    `Required max: <strong>${maxMin} min</strong> (spa ${vol < 10000 ? '<' : '≥'} 10,000 gal)<br>
+     Flow: <strong>${flow} GPM</strong> &nbsp;·&nbsp; Volume: <strong>${vol.toLocaleString()} gal</strong>`,
+    pass ? null : `Increase spa flow rate to at least ${Math.ceil(vol / maxMin)} GPM to achieve ${maxMin}-minute turnover.`
+  );
+}
+
+// 11 Bather Load
+function calcBatherLoad() {
+  const shallow = +document.getElementById('bl_shallow').value || 0;
+  const deep = +document.getElementById('bl_deep').value || 0;
+  const observed = +document.getElementById('bl_observed').value;
+  if (!shallow && !deep) return alert('Enter at least one area value.');
+  const maxLoad = Math.floor(shallow / 27) + Math.floor(deep / 15);
+  const pass = !observed || observed <= maxLoad;
+  const type = observed ? (pass ? 'pass' : 'fail') : 'info';
+  const status = observed ? (pass ? '✓ WITHIN LIMIT' : '✗ OVERCAPACITY') : 'RESULT';
+  showResult('bather', type, status,
+    `Max: ${maxLoad} bathers`,
+    `Shallow area (÷27): <strong>${Math.floor(shallow/27)}</strong> &nbsp;·&nbsp; Deep area (÷15): <strong>${Math.floor(deep/15)}</strong><br>
+     ${observed ? `Observed: <strong>${observed}</strong> — ${pass ? 'Within limit ✓' : `<span style="color:var(--red)">${observed - maxLoad} over capacity ✗</span>`}` : 'Enter observed bather count to check compliance.'}`,
+    (!pass && observed) ? `Current bather count (${observed}) exceeds maximum (${maxLoad}). Request ${observed - maxLoad} bather(s) to exit the pool immediately.` : null
+  );
+}
+
+// 12 Pressure Drop
+function calcPressureDrop() {
+  const inf = +document.getElementById('pd_influent').value;
+  const eff = +document.getElementById('pd_effluent').value;
+  const base = +document.getElementById('pd_baseline').value;
+  if (!inf || !eff) return alert('Enter both influent and effluent pressures.');
+  const dp = inf - eff;
+  if (dp < 0) { alert('Influent pressure must be greater than effluent.'); return; }
+  let type, status, sub, corr = null;
+  sub = `Influent: <strong>${inf} psi</strong> &nbsp;·&nbsp; Effluent: <strong>${eff} psi</strong>`;
+  if (base) {
+    const rise = dp - base;
+    sub += `<br>Baseline ΔP: <strong>${base} psi</strong> &nbsp;·&nbsp; Rise from baseline: <strong>${rise.toFixed(1)} psi</strong>`;
+    if (rise >= 8) { type='fail'; status='✗ BACKWASH REQUIRED'; corr=`ΔP is ${rise.toFixed(1)} psi above baseline (≥8 psi). Initiate backwash procedure immediately.`; }
+    else if (rise >= 5) { type='warn'; status='⚠ BACKWASH SOON'; }
+    else { type='pass'; status='✓ NORMAL'; }
+  } else {
+    if (dp >= 20) { type='fail'; status='✗ HIGH ΔP'; corr='Pressure drop ≥20 psi. Backwash filter. Establish new baseline after backwash.'; }
+    else if (dp >= 12) { type='warn'; status='⚠ ELEVATED ΔP'; }
+    else { type='pass'; status='✓ NORMAL'; }
+  }
+  const box = document.getElementById('res-pressuredrop');
+  box.className = 'result-box show ' + type;
+  document.getElementById('res-pd-status').textContent = status;
+  document.getElementById('res-pd-main').textContent = `ΔP = ${dp.toFixed(1)} psi`;
+  document.getElementById('res-pd-sub').innerHTML = sub;
+  const corrEl = document.getElementById('res-pd-corr');
+  corrEl.style.display = corr ? 'block' : 'none';
+  if (corrEl) corrEl.textContent = corr || '';
+}
+
+// 13 Filter Flow/Area
+document.getElementById('ff_type')?.addEventListener('change', function() {
+  document.getElementById('ff_custom_field').style.display = this.value === 'custom' ? 'flex' : 'none';
+});
+function calcFilterFlow() {
+  const flow = +document.getElementById('ff_flow').value;
+  const area = +document.getElementById('ff_area').value;
+  const typeVal = document.getElementById('ff_type').value;
+  if (!flow||!area) return alert('Please fill all fields.');
+  const max = typeVal === 'custom' ? +document.getElementById('ff_custom').value : +typeVal;
+  const actual = flow / area;
+  const pass = actual <= max;
+  showResult('filterflow',
+    pass ? 'pass' : 'fail',
+    pass ? '✓ WITHIN LIMIT' : '✗ OVERLOADED',
+    `${actual.toFixed(1)} GPM/ft²`,
+    `Flow: <strong>${flow} GPM</strong> &nbsp;·&nbsp; Area: <strong>${area} ft²</strong><br>
+     Maximum: <strong>${max} GPM/ft²</strong>`,
+    pass ? null : `Hydraulic loading (${actual.toFixed(1)} GPM/ft²) exceeds maximum (${max} GPM/ft²). Reduce flow rate or verify filter area.`
+  );
+}
+
+// 14 Pressure Converter
+function calcPressureConv() {
+  const val = +document.getElementById('pc_value').value;
+  const unit = document.querySelector('input[name="pc_unit"]:checked').value;
+  if (!val) return alert('Please enter a pressure value.');
+  let psi;
+  if (unit === 'mpa') psi = val * 145.038;
+  else if (unit === 'bar') psi = val * 14.5038;
+  else psi = val * 0.145038; // kPa
+  const box = document.getElementById('res-pressureconv');
+  box.className = 'result-box show info';
+  document.getElementById('res-pc-main').textContent = `${psi.toFixed(2)} psi`;
+  document.getElementById('res-pc-sub').innerHTML =
+    `${val} ${unit.toUpperCase()} = <strong>${psi.toFixed(2)} psi</strong><br>
+     Reference: 1 MPa = 145.04 psi &nbsp;·&nbsp; 1 bar = 14.50 psi &nbsp;·&nbsp; 1 kPa = 0.145 psi`;
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+loadFacilities();
+</script>
+</body>
+</html>

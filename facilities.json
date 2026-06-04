@@ -1,0 +1,112 @@
+{
+  "facilities": [
+    {
+      "id": "outdoor_complex",
+      "name": "Outdoor Pool Complex",
+      "venues": [
+        {
+          "id": "outdoor_pool_a",
+          "name": "Pool A",
+          "type": "pool",
+          "location": "outdoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        },
+        {
+          "id": "outdoor_pool_b",
+          "name": "Pool B",
+          "type": "pool",
+          "location": "outdoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        },
+        {
+          "id": "outdoor_pool_c",
+          "name": "Pool C",
+          "type": "wading_pool",
+          "location": "outdoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        }
+      ]
+    },
+    {
+      "id": "gym_a",
+      "name": "Gym A",
+      "venues": [
+        {
+          "id": "gym_a_pool",
+          "name": "Pool",
+          "type": "pool",
+          "location": "indoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        },
+        {
+          "id": "gym_a_spa",
+          "name": "Spa",
+          "type": "spa",
+          "location": "indoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        }
+      ]
+    },
+    {
+      "id": "gym_b",
+      "name": "Gym B",
+      "venues": [
+        {
+          "id": "gym_b_pool_1",
+          "name": "Pool 1",
+          "type": "pool",
+          "location": "indoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        },
+        {
+          "id": "gym_b_pool_2",
+          "name": "Pool 2",
+          "type": "pool",
+          "location": "indoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        },
+        {
+          "id": "gym_b_spa_1",
+          "name": "Spa 1",
+          "type": "spa",
+          "location": "indoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        },
+        {
+          "id": "gym_b_spa_2",
+          "name": "Spa 2",
+          "type": "spa",
+          "location": "indoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        },
+        {
+          "id": "gym_b_spa_3",
+          "name": "Spa 3",
+          "type": "spa",
+          "location": "indoor",
+          "volume_gal": 0,
+          "pump_count": 1,
+          "note": "TBD"
+        }
+      ]
+    }
+  ]
+}
