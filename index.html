@@ -384,12 +384,64 @@
       letter-spacing: 0.5px;
     }
 
+    /* ── REFERENCE BOX ── */
+    .ref-box {
+      margin-top: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
+      border-radius: 6px;
+      padding: 12px 16px;
+    }
+    .ref-box-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 8px;
+      font-family: var(--cond);
+    }
+    .ref-box ul {
+      list-style: none;
+      margin: 0; padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ref-box li {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-family: var(--mono);
+    }
+    .ref-box li strong { color: var(--text); font-family: var(--sans); }
+
     /* ── DIVIDER ── */
     .divider {
       border: none;
       border-top: 1px solid var(--border);
       margin: 20px 0;
     }
+
+    /* ── RESET BUTTON ── */
+    .reset-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .15s;
+      margin-bottom: 18px;
+      display: block;
+    }
+    .reset-btn:hover { border-color: var(--red); color: var(--red); }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 640px) {
@@ -450,7 +502,7 @@
       <span class="icon">💧</span><span>Min. Flow Rate</span><span class="num">03</span>
     </button>
     <button class="tab-btn" onclick="showTab('dual-pump')">
-      <span class="icon">⚙️</span><span>Dual Pump Flow</span><span class="num">04</span>
+      <span class="icon">⚙️</span><span>Pump Flow Rate</span><span class="num">04</span>
     </button>
 
     <div class="tab-group-label">Water Chemistry</div>
@@ -460,35 +512,28 @@
     <button class="tab-btn" onclick="showTab('breakpoint')">
       <span class="icon">⚡</span><span>Breakpoint Cl₂</span><span class="num">06</span>
     </button>
-    <button class="tab-btn" onclick="showTab('cya')">
-      <span class="icon">☀️</span><span>Cyanuric Acid</span><span class="num">07</span>
-    </button>
+
     <button class="tab-btn" onclick="showTab('lsi')">
-      <span class="icon">⚖️</span><span>Langelier Index</span><span class="num">08</span>
+      <span class="icon">⚖️</span><span>Langelier Index</span><span class="num">07</span>
     </button>
 
     <div class="tab-group-label">Spa</div>
     <button class="tab-btn" onclick="showTab('spa-drain')">
-      <span class="icon">🛁</span><span>Spa Drain Interval</span><span class="num">09</span>
+      <span class="icon">🛁</span><span>Spa Drain Interval</span><span class="num">08</span>
     </button>
     <button class="tab-btn" onclick="showTab('spa-turnover')">
-      <span class="icon">♻️</span><span>Spa Turnover</span><span class="num">10</span>
+      <span class="icon">♻️</span><span>Spa Turnover</span><span class="num">09</span>
     </button>
 
     <div class="tab-group-label">Bather Load</div>
     <button class="tab-btn" onclick="showTab('bather')">
-      <span class="icon">🏊</span><span>Max Bather Load</span><span class="num">11</span>
+      <span class="icon">🏊</span><span>Max Bather Load</span><span class="num">10</span>
     </button>
 
     <div class="tab-group-label">Filter System</div>
-    <button class="tab-btn" onclick="showTab('pressure-drop')">
-      <span class="icon">🔧</span><span>Pressure Drop</span><span class="num">12</span>
-    </button>
-    <button class="tab-btn" onclick="showTab('filter-flow')">
-      <span class="icon">🌀</span><span>Filter Flow/Area</span><span class="num">13</span>
-    </button>
+
     <button class="tab-btn" onclick="showTab('pressure-conv')">
-      <span class="icon">📊</span><span>Pressure Converter</span><span class="num">14</span>
+      <span class="icon">📊</span><span>Pressure Converter</span><span class="num">11</span>
     </button>
   </nav>
 
@@ -531,10 +576,20 @@
         </div>
       </div>
       <button class="calc-btn" onclick="calcVolume()">CALCULATE VOLUME</button>
+      <button class="reset-btn" onclick="resetPanel('pool-volume')">↺ Reset</button>
       <div class="result-box info" id="res-volume">
         <div class="result-status">Result</div>
         <div class="result-main" id="res-volume-main"></div>
         <div class="result-sub" id="res-volume-sub"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 Formula Reference</div>
+        <ul>
+          <li><strong>Rectangular:</strong> L × W × Avg Depth × 7.48</li>
+          <li><strong>Oval:</strong> π × (L/2) × (W/2) × Avg Depth × 7.48</li>
+          <li><strong>L-Shape:</strong> (Area A + Area B) × Avg Depth × 7.48</li>
+          <li><strong>Avg Depth:</strong> (Shallow + Deep) ÷ 2</li>
+        </ul>
       </div>
     </div>
 
@@ -569,11 +624,23 @@
         </div>
       </div>
       <button class="calc-btn" onclick="calcTurnover()">CALCULATE TURNOVER</button>
+      <button class="reset-btn" onclick="resetPanel('turnover')">↺ Reset</button>
       <div class="result-box" id="res-turnover">
         <div class="result-status" id="res-turnover-status"></div>
         <div class="result-main" id="res-turnover-main"></div>
         <div class="result-sub" id="res-turnover-sub"></div>
         <div class="result-corrective" id="res-turnover-corr" style="display:none"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 TB MED 575 Table 2-2 — Max Turnover Times</div>
+        <ul>
+          <li><strong>Pool &lt;200,000 gal</strong> → 4 hr</li>
+          <li><strong>Pool ≥200,000 gal</strong> → 5 hr</li>
+          <li><strong>Wading Pool</strong> → 0.5 hr</li>
+          <li><strong>Therapy Pool</strong> → 0.5 hr</li>
+          <li><strong>Catch/Plunge Pool</strong> → 1 hr</li>
+          <li><strong>Spray Pad</strong> → 0.17 hr (10 min)</li>
+        </ul>
       </div>
     </div>
 
@@ -602,18 +669,25 @@
         </div>
       </div>
       <button class="calc-btn" onclick="calcMinFlow()">CALCULATE MIN FLOW</button>
+      <button class="reset-btn" onclick="resetPanel('min-flow')">↺ Reset</button>
       <div class="result-box info" id="res-minflow">
         <div class="result-status">Result</div>
         <div class="result-main" id="res-minflow-main"></div>
         <div class="result-sub" id="res-minflow-sub"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 Formula</div>
+        <ul>
+          <li><strong>Min GPM</strong> = Volume (gal) ÷ Max Turnover (hr) ÷ 60</li>
+        </ul>
       </div>
     </div>
 
     <!-- 04 DUAL PUMP -->
     <div class="calc-panel" id="panel-dual-pump">
       <div class="panel-header">
-        <h2>Dual Pump Flow</h2>
-        <p>Combines two pump flow rates and calculates turnover. Also shows single-pump fallback turnover.</p>
+        <h2>Pump Flow Rate & Turnover</h2>
+        <p>Single or dual pump turnover calculation. Leave Pump B blank for single-pump mode.</p>
         <span class="ref">TB MED 575 §2-35</span>
       </div>
       <div class="form-grid">
@@ -630,15 +704,23 @@
           <div class="field-row"><input type="number" id="dp_pump_a" placeholder="e.g. 350"><span class="unit-label">GPM</span></div>
         </div>
         <div class="field">
-          <label>Pump B Flow Rate</label>
-          <div class="field-row"><input type="number" id="dp_pump_b" placeholder="e.g. 300"><span class="unit-label">GPM</span></div>
+          <label>Pump B Flow Rate <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+          <div class="field-row"><input type="number" id="dp_pump_b" placeholder="leave blank if single pump"><span class="unit-label">GPM</span></div>
         </div>
       </div>
       <button class="calc-btn" onclick="calcDualPump()">CALCULATE</button>
+      <button class="reset-btn" onclick="resetPanel('dual-pump')">↺ Reset</button>
       <div class="result-box" id="res-dualpump">
         <div class="result-status" id="res-dualpump-status"></div>
         <div class="result-main" id="res-dualpump-main"></div>
         <div class="result-sub" id="res-dualpump-sub"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 Formula</div>
+        <ul>
+          <li><strong>Turnover (hr)</strong> = Volume ÷ Flow (GPM) ÷ 60</li>
+          <li><strong>Combined flow</strong> = Pump A + Pump B GPM</li>
+        </ul>
       </div>
     </div>
 
@@ -646,7 +728,7 @@
     <div class="calc-panel" id="panel-bromine">
       <div class="panel-header">
         <h2>Bromine from Total Chlorine Reading</h2>
-        <p>Converts DPD Total Chlorine reading to Total Bromine. Pass/fail vs. TB MED 575 minimum.</p>
+        <p>Converts DPD Total Chlorine reading to Total Bromine. Pass/fail vs. TB MED 575 standards.</p>
         <span class="ref">TB MED 575 §2-29</span>
       </div>
       <div class="form-grid">
@@ -655,19 +737,32 @@
           <div class="field-row"><input type="number" id="br_tc" placeholder="e.g. 1.5" step="0.1"><span class="unit-label">mg/L</span></div>
         </div>
         <div class="field">
-          <label>Pool Location</label>
-          <select id="br_location" style="width:100%">
-            <option value="indoor">Indoor</option>
-            <option value="outdoor">Outdoor</option>
+          <label>Venue Type</label>
+          <select id="br_venue_type" style="width:100%">
+            <option value="pool_indoor">Indoor Pool</option>
+            <option value="spa">Spa</option>
+            <option value="outdoor">Outdoor Pool</option>
           </select>
         </div>
       </div>
       <button class="calc-btn" onclick="calcBromine()">CALCULATE BROMINE</button>
+      <button class="reset-btn" onclick="resetPanel('bromine')">↺ Reset</button>
       <div class="result-box" id="res-bromine">
         <div class="result-status" id="res-bromine-status"></div>
         <div class="result-main" id="res-bromine-main"></div>
         <div class="result-sub" id="res-bromine-sub"></div>
         <div class="result-corrective" id="res-bromine-corr" style="display:none"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 TB MED 575 §2-29 — Bromine Standards</div>
+        <ul>
+          <li><strong>Indoor Pool (min):</strong> 3.0 mg/L</li>
+          <li><strong>Indoor Pool (max):</strong> 4.0 mg/L</li>
+          <li><strong>Spa (min):</strong> 6.0 mg/L</li>
+          <li><strong>Outdoor Pool:</strong> Not permitted (UV degrades bromine)</li>
+          <li><strong>Conversion:</strong> TC (DPD) × 2.25 = Total Bromine</li>
+          <li><strong>Feed method:</strong> Solid-stick or tablet-type, NSF-certified equipment</li>
+        </ul>
       </div>
     </div>
 
@@ -693,46 +788,24 @@
         </div>
       </div>
       <button class="calc-btn" onclick="calcBreakpoint()">CALCULATE DOSE</button>
+      <button class="reset-btn" onclick="resetPanel('breakpoint')">↺ Reset</button>
       <div class="result-box" id="res-breakpoint">
-        <div class="result-status" id="res-bp-status"></div>
-        <div class="result-main" id="res-bp-main"></div>
-        <div class="result-sub" id="res-bp-sub"></div>
+        <div class="result-status" id="res-breakpoint-status"></div>
+        <div class="result-main" id="res-breakpoint-main"></div>
+        <div class="result-sub" id="res-breakpoint-sub"></div>
+        <div class="result-corrective" id="res-breakpoint-corr" style="display:none"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 TB MED 575 §2-27 — Breakpoint Reference</div>
+        <ul>
+          <li><strong>Combined Chlorine (CC)</strong> = Total Cl − Free Cl</li>
+          <li><strong>Breakpoint dose</strong> = CC × 10 (mg/L Cl₂ needed)</li>
+          <li><strong>CC limit:</strong> ≤ 0.2 mg/L</li>
+          <li><strong>Goal:</strong> Destroy chloramines causing odor &amp; irritation</li>
+        </ul>
       </div>
     </div>
 
-    <!-- 07 CYA -->
-    <div class="calc-panel" id="panel-cya">
-      <div class="panel-header">
-        <h2>Cyanuric Acid Check</h2>
-        <p>Checks CYA level against TB MED 575 limits. CYA only permitted in outdoor pools.</p>
-        <span class="ref">TB MED 575 §2-28</span>
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>CYA Level (mg/L)</label>
-          <div class="field-row"><input type="number" id="cya_val" placeholder="e.g. 25"><span class="unit-label">mg/L</span></div>
-        </div>
-        <div class="field">
-          <label>Pool Type</label>
-          <select id="cya_type" style="width:100%">
-            <option value="outdoor_pool">Outdoor Pool</option>
-            <option value="indoor_pool">Indoor Pool</option>
-            <option value="spa">Spa</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Free Chlorine (mg/L) — if CYA used</label>
-          <div class="field-row"><input type="number" id="cya_fc" placeholder="e.g. 2.0" step="0.1"><span class="unit-label">mg/L</span></div>
-        </div>
-      </div>
-      <button class="calc-btn" onclick="calcCYA()">CHECK CYA</button>
-      <div class="result-box" id="res-cya">
-        <div class="result-status" id="res-cya-status"></div>
-        <div class="result-main" id="res-cya-main"></div>
-        <div class="result-sub" id="res-cya-sub"></div>
-        <div class="result-corrective" id="res-cya-corr" style="display:none"></div>
-      </div>
-    </div>
 
     <!-- 08 LSI -->
     <div class="calc-panel" id="panel-lsi">
@@ -764,11 +837,23 @@
         </div>
       </div>
       <button class="calc-btn" onclick="calcLSI()">CALCULATE LSI</button>
+      <button class="reset-btn" onclick="resetPanel('lsi')">↺ Reset</button>
       <div class="result-box" id="res-lsi">
         <div class="result-status" id="res-lsi-status"></div>
         <div class="result-main" id="res-lsi-main"></div>
         <div class="result-sub" id="res-lsi-sub"></div>
         <div class="result-corrective" id="res-lsi-corr" style="display:none"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 TB MED 575 Appendix G — LSI Standards</div>
+        <ul>
+          <li><strong>Formula:</strong> LSI = pH + TF + CF + AF − 12.1</li>
+          <li><strong>Acceptable range:</strong> −0.5 to +0.5</li>
+          <li><strong>Negative value:</strong> Corrosive tendency</li>
+          <li><strong>Positive value:</strong> Scale-forming tendency</li>
+          <li><strong>pH target:</strong> 7.4 – 7.6</li>
+          <li><strong>Total Alkalinity:</strong> 50 – 150 mg/L</li>
+        </ul>
       </div>
     </div>
 
@@ -790,10 +875,19 @@
         </div>
       </div>
       <button class="calc-btn" onclick="calcSpaDrain()">CALCULATE DRAIN INTERVAL</button>
+      <button class="reset-btn" onclick="resetPanel('spa-drain')">↺ Reset</button>
       <div class="result-box info" id="res-spadrain">
         <div class="result-status">Result</div>
         <div class="result-main" id="res-sd-main"></div>
         <div class="result-sub" id="res-sd-sub"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 MAHC — Spa Drain Interval Formula</div>
+        <ul>
+          <li><strong>Formula:</strong> Volume (gal) ÷ 3 ÷ Avg Daily Bathers</li>
+          <li><strong>Result:</strong> Maximum days between full drain &amp; refill</li>
+          <li><strong>Purpose:</strong> Prevent TDS buildup from bather waste</li>
+        </ul>
       </div>
     </div>
 
@@ -815,11 +909,20 @@
         </div>
       </div>
       <button class="calc-btn" onclick="calcSpaTurnover()">CALCULATE</button>
+      <button class="reset-btn" onclick="resetPanel('spa-turnover')">↺ Reset</button>
       <div class="result-box" id="res-spaturnover">
         <div class="result-status" id="res-spaturnover-status"></div>
         <div class="result-main" id="res-spaturnover-main"></div>
         <div class="result-sub" id="res-spaturnover-sub"></div>
         <div class="result-corrective" id="res-spaturnover-corr" style="display:none"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 TB MED 575 Table 2-2 — Spa Turnover Standards</div>
+        <ul>
+          <li><strong>Spa &lt;10,000 gal:</strong> 0.25 hr (15 min) max</li>
+          <li><strong>Spa ≥10,000 gal:</strong> 0.5 hr (30 min) max</li>
+          <li><strong>Formula:</strong> Volume (gal) ÷ Flow (GPM) = Minutes</li>
+        </ul>
       </div>
     </div>
 
@@ -845,86 +948,25 @@
         </div>
       </div>
       <button class="calc-btn" onclick="calcBatherLoad()">CALCULATE</button>
+      <button class="reset-btn" onclick="resetPanel('bather')">↺ Reset</button>
       <div class="result-box" id="res-bather">
         <div class="result-status" id="res-bather-status"></div>
         <div class="result-main" id="res-bather-main"></div>
         <div class="result-sub" id="res-bather-sub"></div>
         <div class="result-corrective" id="res-bather-corr" style="display:none"></div>
       </div>
-    </div>
-
-    <!-- 12 PRESSURE DROP -->
-    <div class="calc-panel" id="panel-pressure-drop">
-      <div class="panel-header">
-        <h2>Filter Pressure Drop</h2>
-        <p>Calculates differential pressure across the filter. High ΔP indicates backwash needed.</p>
-        <span class="ref">MAHC §4.7.2</span>
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Influent Pressure (psi)</label>
-          <div class="field-row"><input type="number" id="pd_influent" placeholder="e.g. 25" step="0.1"><span class="unit-label">psi</span></div>
-        </div>
-        <div class="field">
-          <label>Effluent Pressure (psi)</label>
-          <div class="field-row"><input type="number" id="pd_effluent" placeholder="e.g. 15" step="0.1"><span class="unit-label">psi</span></div>
-        </div>
-        <div class="field">
-          <label>Clean Filter Baseline ΔP (psi) <span style="color:var(--muted);font-weight:400">(opt.)</span></label>
-          <div class="field-row"><input type="number" id="pd_baseline" placeholder="e.g. 7" step="0.1"><span class="unit-label">psi</span></div>
-        </div>
-      </div>
-      <button class="calc-btn" onclick="calcPressureDrop()">CALCULATE ΔP</button>
-      <div class="result-box" id="res-pressuredrop">
-        <div class="result-status" id="res-pressuredrop-status"></div>
-        <div class="result-main" id="res-pressuredrop-main"></div>
-        <div class="result-sub" id="res-pressuredrop-sub"></div>
-        <div class="result-corrective" id="res-pressuredrop-corr" style="display:none"></div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 TB MED 575 §2-16 — Max Bather Load</div>
+        <ul>
+          <li><strong>Shallow area (≤5 ft):</strong> 1 bather per 27 ft²</li>
+          <li><strong>Deep area (&gt;5 ft):</strong> 1 bather per 15 ft²</li>
+          <li><strong>Total max</strong> = (Shallow ft² ÷ 27) + (Deep ft² ÷ 15)</li>
+        </ul>
       </div>
     </div>
 
-    <!-- 13 FILTER FLOW/AREA -->
-    <div class="calc-panel" id="panel-filter-flow">
-      <div class="calc-panel active" id="panel-filter-flow-inner">
-      <div class="panel-header">
-        <h2>Filter Flow Rate per Area</h2>
-        <p>Checks hydraulic loading rate against filter manufacturer / MAHC limits.</p>
-        <span class="ref">MAHC §4.7.2.2</span>
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Flow Rate (GPM)</label>
-          <div class="field-row"><input type="number" id="ff_flow" placeholder="e.g. 650"><span class="unit-label">GPM</span></div>
-        </div>
-        <div class="field">
-          <label>Filter Surface Area (ft²)</label>
-          <div class="field-row"><input type="number" id="ff_area" placeholder="e.g. 120" step="0.1"><span class="unit-label">ft²</span></div>
-        </div>
-        <div class="field">
-          <label>Filter Type</label>
-          <select id="ff_type" style="width:100%">
-            <option value="15">Sand (max 15 GPM/ft²)</option>
-            <option value="20">High-Rate Sand (max 20 GPM/ft²)</option>
-            <option value="2">DE Filter (max 2 GPM/ft²)</option>
-            <option value="custom">Custom limit</option>
-          </select>
-        </div>
-        <div class="field" id="ff_custom_field" style="display:none">
-          <label>Custom Max (GPM/ft²)</label>
-          <div class="field-row"><input type="number" id="ff_custom" placeholder="e.g. 18"><span class="unit-label">GPM/ft²</span></div>
-        </div>
-      </div>
-      <button class="calc-btn" onclick="calcFilterFlow()">CALCULATE</button>
-      <div class="result-box" id="res-filterflow">
-        <div class="result-status" id="res-filterflow-status"></div>
-        <div class="result-main" id="res-filterflow-main"></div>
-        <div class="result-sub" id="res-filterflow-sub"></div>
-        <div class="result-corrective" id="res-filterflow-corr" style="display:none"></div>
-      </div>
-      </div>
-    </div>
 
-    <!-- 14 PRESSURE CONVERTER -->
+    <!-- PRESSURE CONVERTER -->
     <div class="calc-panel" id="panel-pressure-conv">
       <div class="panel-header">
         <h2>Pressure Unit Converter</h2>
@@ -949,10 +991,20 @@
         </div>
       </div>
       <button class="calc-btn" onclick="calcPressureConv()">CONVERT TO PSI</button>
+      <button class="reset-btn" onclick="resetPanel('pressure-conv')">↺ Reset</button>
       <div class="result-box info" id="res-pressureconv">
         <div class="result-status">Result</div>
         <div class="result-main" id="res-pc-main"></div>
         <div class="result-sub" id="res-pc-sub"></div>
+      </div>
+      <div class="ref-box">
+        <div class="ref-box-title">📋 Pressure Conversion Reference</div>
+        <ul>
+          <li><strong>1 MPa</strong> = 145.04 psi</li>
+          <li><strong>1 bar</strong> = 14.504 psi</li>
+          <li><strong>1 kPa</strong> = 0.145 psi</li>
+          <li><strong>MAHC 4.7.2.2.5:</strong> Gauges shall be marked in psi with 1 psi increments</li>
+        </ul>
       </div>
     </div>
 
@@ -1093,7 +1145,37 @@ function fillVolumeFields() {
 }
 
 // ══════════════════════════════════════════
-// UI — TAB SWITCHING
+// RESET
+// ══════════════════════════════════════════
+function resetPanel(panelId) {
+  const panel = document.getElementById('panel-' + panelId);
+  if (!panel) return;
+  // Clear all inputs
+  panel.querySelectorAll('input[type="number"], input[type="text"]').forEach(el => {
+    el.value = '';
+  });
+  // Reset selects to first option
+  panel.querySelectorAll('select').forEach(el => {
+    el.selectedIndex = 0;
+  });
+  // Reset radio buttons to first
+  const radioGroups = {};
+  panel.querySelectorAll('input[type="radio"]').forEach(el => {
+    if (!radioGroups[el.name]) { el.checked = true; radioGroups[el.name] = true; }
+    else el.checked = false;
+  });
+  // Hide result box
+  panel.querySelectorAll('.result-box').forEach(el => {
+    el.className = el.className.replace(/\bshow\b|\bpass\b|\bfail\b|\bwarn\b|\binfo\b/g, '').trim();
+    el.querySelectorAll('.result-status,.result-main,.result-sub').forEach(c => c.innerHTML = '');
+    el.querySelectorAll('.result-corrective').forEach(c => { c.style.display='none'; c.textContent=''; });
+  });
+  // Re-fill volume if venue selected
+  if (currentVenue && currentVenue.volume_gal > 0) fillVolumeFields();
+  // Trigger shape field update for pool-volume panel
+  if (panelId === 'pool-volume') updateShapeFields();
+}
+
 // ══════════════════════════════════════════
 function showTab(id) {
   document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
@@ -1227,51 +1309,92 @@ function calcMinFlow() {
     `To achieve <strong>${maxHr}-hour</strong> maximum turnover for <strong>${vol.toLocaleString()} gal</strong>.`;
 }
 
-// 04 Dual Pump
+// 04 Pump Flow / Dual Pump
 function calcDualPump() {
   const vol = +document.getElementById('dp_volume').value;
   const maxTo = +document.getElementById('dp_max_to').value || 4;
   const pA = +document.getElementById('dp_pump_a').value;
   const pB = +document.getElementById('dp_pump_b').value;
-  if (!vol||!pA||!pB) return alert('Please fill all fields.');
-  const combined = pA + pB;
+  if (!vol || !pA) return alert('Please enter Pool Volume and at least Pump A flow rate.');
+
+  const isDual = pB > 0;
+  const combined = isDual ? pA + pB : pA;
   const toCombined = vol / combined / 60;
-  const toA = vol / pA / 60;
-  const toB = vol / pB / 60;
   const pass = toCombined <= maxTo;
+
+  let sub, mainText;
+
+  if (isDual) {
+    const toA = vol / pA / 60;
+    const toB = vol / pB / 60;
+    mainText = `${toCombined.toFixed(2)} hr (combined)`;
+    sub = `Pump A: <strong>${pA} GPM</strong> → ${toA.toFixed(2)} hr alone<br>
+           Pump B: <strong>${pB} GPM</strong> → ${toB.toFixed(2)} hr alone<br>
+           Combined: <strong>${combined} GPM</strong> &nbsp;·&nbsp; Required max: <strong>${maxTo} hr</strong>`;
+  } else {
+    mainText = `${toCombined.toFixed(2)} hr`;
+    sub = `Pump A: <strong>${pA} GPM</strong> (single pump)<br>
+           Required max: <strong>${maxTo} hr</strong>`;
+  }
+
   showResult('dualpump',
     pass ? 'pass' : 'fail',
-    pass ? '✓ COMBINED PASS' : '✗ COMBINED FAIL',
-    `${toCombined.toFixed(2)} hr (combined)`,
-    `Pump A: <strong>${pA} GPM</strong> → ${toA.toFixed(2)} hr alone<br>
-     Pump B: <strong>${pB} GPM</strong> → ${toB.toFixed(2)} hr alone<br>
-     Combined: <strong>${combined} GPM</strong> &nbsp;·&nbsp; Required max: <strong>${maxTo} hr</strong>`,
-    pass ? null : null
+    pass ? `✓ PASS${isDual ? ' (combined)' : ''}` : `✗ FAIL${isDual ? ' (combined)' : ''}`,
+    mainText, sub,
+    pass ? null : `Increase flow rate to at least ${Math.ceil(vol / maxTo / 60)} GPM to achieve ${maxTo}-hour turnover.`
   );
 }
 
 // 05 Bromine
 function calcBromine() {
   const tc = +document.getElementById('br_tc').value;
-  const loc = document.getElementById('br_location').value;
+  const venueType = document.getElementById('br_venue_type').value;
   if (!tc) return alert('Please enter TC reading.');
-  if (loc === 'outdoor') {
-    showResult('bromine','fail','✗ NOT PERMITTED',
+
+  // Outdoor — not permitted
+  if (venueType === 'outdoor') {
+    showResult('bromine', 'fail', '✗ NOT PERMITTED',
       'Bromine — Outdoor Use',
       'TB MED 575 §2-29: Bromine is rapidly displaced by sunlight and is <strong>not permitted</strong> in outdoor facilities.',
       'Use chlorine for outdoor pools. Bromine is only approved for indoor pools and spas.');
     return;
   }
+
   const br = tc * 2.25;
-  const pass = br >= 3.0;
-  showResult('bromine',
-    pass ? 'pass' : 'fail',
-    pass ? '✓ PASS' : '✗ FAIL',
-    `${br.toFixed(2)} mg/L Total Bromine`,
-    `TC reading: <strong>${tc} mg/L</strong> × 2.25 = <strong>${br.toFixed(2)} mg/L Br</strong><br>
-     Required minimum: <strong>3.0 mg/L</strong>`,
-    pass ? null : `Increase bromine feed. Current: ${br.toFixed(2)} mg/L — Deficit: ${(3.0 - br).toFixed(2)} mg/L below minimum.`
-  );
+
+  if (venueType === 'spa') {
+    // Spa: min 6.0 mg/L (no max specified in TB MED 575)
+    const min = 6.0;
+    const pass = br >= min;
+    showResult('bromine',
+      pass ? 'pass' : 'fail',
+      pass ? '✓ PASS — SPA' : '✗ FAIL — SPA',
+      `${br.toFixed(2)} mg/L Total Bromine`,
+      `TC reading: <strong>${tc} mg/L</strong> × 2.25 = <strong>${br.toFixed(2)} mg/L Br</strong><br>
+       Spa minimum: <strong>6.0 mg/L</strong>`,
+      pass ? null : `Spa bromine below minimum. Current: ${br.toFixed(2)} mg/L — Deficit: ${(min - br).toFixed(2)} mg/L. Increase bromine feed immediately.`
+    );
+  } else {
+    // Indoor Pool: min 3.0 mg/L, max 4.0 mg/L
+    const min = 3.0;
+    const max = 4.0;
+    let type, status, corr = null;
+    if (br < min) {
+      type = 'fail'; status = '✗ FAIL — BELOW MINIMUM';
+      corr = `Pool bromine below minimum. Current: ${br.toFixed(2)} mg/L — Deficit: ${(min - br).toFixed(2)} mg/L. Increase bromine feed.`;
+    } else if (br > max) {
+      type = 'warn'; status = '⚠ EXCEEDS MAXIMUM';
+      corr = `Pool bromine exceeds maximum of 4.0 mg/L. Current: ${br.toFixed(2)} mg/L — Excess: ${(br - max).toFixed(2)} mg/L. Reduce feed rate; do not allow bather entry until below 4.0 mg/L.`;
+    } else {
+      type = 'pass'; status = '✓ PASS — POOL';
+    }
+    showResult('bromine', type, status,
+      `${br.toFixed(2)} mg/L Total Bromine`,
+      `TC reading: <strong>${tc} mg/L</strong> × 2.25 = <strong>${br.toFixed(2)} mg/L Br</strong><br>
+       Pool range: <strong>3.0 – 4.0 mg/L</strong>`,
+      corr
+    );
+  }
 }
 
 // 06 Breakpoint
@@ -1294,46 +1417,6 @@ function calcBreakpoint() {
     `Add ${doseNeeded.toFixed(1)} mg/L Cl₂`,
     sub, null
   );
-}
-
-// 07 CYA
-function calcCYA() {
-  const val = +document.getElementById('cya_val').value;
-  const type = document.getElementById('cya_type').value;
-  const fc = +document.getElementById('cya_fc').value;
-  if (val === '' || isNaN(val)) return alert('Please enter CYA level.');
-
-  if (type === 'indoor_pool' || type === 'spa') {
-    showResult('cya','fail','✗ NOT PERMITTED',
-      `CYA in ${type === 'spa' ? 'Spa' : 'Indoor Pool'}`,
-      'TB MED 575 §2-28(e): <strong>Cyanuric acid and stabilized chlorines may not be used in spas or indoor pools.</strong>',
-      'Discontinue CYA use immediately. Drain and refill if CYA is present in indoor pool or spa.');
-    return;
-  }
-  // Outdoor pool
-  let statusType, statusText, corrText = null;
-  if (val >= 50) {
-    statusType = 'fail'; statusText = '✗ FAIL — EXCEEDS LIMIT';
-    corrText = `CYA at ${val} mg/L exceeds absolute maximum of 50 mg/L. Partial drain and refill required to dilute CYA level.`;
-  } else if (val > 30) {
-    statusType = 'warn'; statusText = '⚠ WARNING — ABOVE RECOMMENDED';
-    corrText = `CYA at ${val} mg/L exceeds recommended max of 30 mg/L. Monitor closely; consider partial drain/refill.`;
-  } else {
-    statusType = 'pass'; statusText = '✓ PASS';
-  }
-  let sub = `CYA: <strong>${val} mg/L</strong> &nbsp;·&nbsp; Recommended max: <strong>30 mg/L</strong> &nbsp;·&nbsp; Absolute max: <strong>50 mg/L</strong>`;
-  if (fc) {
-    const fcPass = fc >= 2.0;
-    sub += `<br>Free Chlorine with CYA: <strong>${fc} mg/L</strong> — Required min with CYA: 2.0 mg/L — ${fcPass ? '<span style="color:var(--green)">OK</span>' : '<span style="color:var(--red)">INSUFFICIENT</span>'}`;
-  }
-  const box = document.getElementById('res-cya');
-  box.className = 'result-box show ' + statusType;
-  document.getElementById('res-cya-status').textContent = statusText;
-  document.getElementById('res-cya-main').textContent = `${val} mg/L CYA`;
-  document.getElementById('res-cya-sub').innerHTML = sub;
-  const corrEl = document.getElementById('res-cya-corr');
-  corrEl.style.display = corrText ? 'block' : 'none';
-  corrEl.textContent = corrText || '';
 }
 
 // 08 LSI
@@ -1416,52 +1499,7 @@ function calcBatherLoad() {
 }
 
 // 12 Pressure Drop
-function calcPressureDrop() {
-  const inf = +document.getElementById('pd_influent').value;
-  const eff = +document.getElementById('pd_effluent').value;
-  const base = +document.getElementById('pd_baseline').value;
-  if (!inf || !eff) return alert('Enter both influent and effluent pressures.');
-  const dp = inf - eff;
-  if (dp < 0) { alert('Influent pressure must be greater than effluent.'); return; }
-  let type, status, corr = null;
-  let sub = `Influent: <strong>${inf} psi</strong> &nbsp;·&nbsp; Effluent: <strong>${eff} psi</strong>`;
-  if (base) {
-    const rise = dp - base;
-    sub += `<br>Baseline ΔP: <strong>${base} psi</strong> &nbsp;·&nbsp; Rise from baseline: <strong>${rise.toFixed(1)} psi</strong>`;
-    if (rise >= 8) { type='fail'; status='✗ BACKWASH REQUIRED'; corr=`ΔP is ${rise.toFixed(1)} psi above baseline (≥8 psi). Initiate backwash procedure immediately.`; }
-    else if (rise >= 5) { type='warn'; status='⚠ BACKWASH SOON'; }
-    else { type='pass'; status='✓ NORMAL'; }
-  } else {
-    if (dp >= 20) { type='fail'; status='✗ HIGH ΔP'; corr='Pressure drop ≥20 psi. Backwash filter. Establish new baseline after backwash.'; }
-    else if (dp >= 12) { type='warn'; status='⚠ ELEVATED ΔP'; }
-    else { type='pass'; status='✓ NORMAL'; }
-  }
-  showResult('pressuredrop', type, status, `ΔP = ${dp.toFixed(1)} psi`, sub, corr);
-}
-
-// 13 Filter Flow/Area
-document.getElementById('ff_type')?.addEventListener('change', function() {
-  document.getElementById('ff_custom_field').style.display = this.value === 'custom' ? 'flex' : 'none';
-});
-function calcFilterFlow() {
-  const flow = +document.getElementById('ff_flow').value;
-  const area = +document.getElementById('ff_area').value;
-  const typeVal = document.getElementById('ff_type').value;
-  if (!flow||!area) return alert('Please fill all fields.');
-  const max = typeVal === 'custom' ? +document.getElementById('ff_custom').value : +typeVal;
-  const actual = flow / area;
-  const pass = actual <= max;
-  showResult('filterflow',
-    pass ? 'pass' : 'fail',
-    pass ? '✓ WITHIN LIMIT' : '✗ OVERLOADED',
-    `${actual.toFixed(1)} GPM/ft²`,
-    `Flow: <strong>${flow} GPM</strong> &nbsp;·&nbsp; Area: <strong>${area} ft²</strong><br>
-     Maximum: <strong>${max} GPM/ft²</strong>`,
-    pass ? null : `Hydraulic loading (${actual.toFixed(1)} GPM/ft²) exceeds maximum (${max} GPM/ft²). Reduce flow rate or verify filter area.`
-  );
-}
-
-// 14 Pressure Converter
+// Pressure Converter
 function calcPressureConv() {
   const val = +document.getElementById('pc_value').value;
   const unit = document.querySelector('input[name="pc_unit"]:checked').value;
