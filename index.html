@@ -625,6 +625,8 @@
           <label for="to_spa_s">Spa &lt;10k gal</label>
           <input type="radio" name="to_type" id="to_spa_l" value="spa_large">
           <label for="to_spa_l">Spa ≥10k gal</label>
+          <input type="radio" name="to_type" id="to_catch" value="catch">
+          <label for="to_catch">Catch/Plunge Pool</label>
         </div>
       </div>
       <button class="calc-btn" onclick="calcTurnover()">CALCULATE TURNOVER</button>
@@ -1078,7 +1080,7 @@ function onFacilityChange() {
   facility.venues.forEach(v => {
     const opt = document.createElement('option');
     opt.value = v.id;
-    const typeLabel = v.type === 'spa' ? '🛁' : v.type === 'wading_pool' ? '🏖' : '🏊';
+    const typeLabel = v.type === 'spa' ? '🛁' : v.type === 'wading_pool' ? '🏖' : v.type === 'catch_pool' ? '🌊' : '🏊';
     opt.textContent = `${typeLabel} ${v.name}`;
     venueSel.appendChild(opt);
   });
@@ -1130,7 +1132,7 @@ function updateBadge() {
   }
   if (currentVenue.manual) {
     badge.className = 'venue-badge loaded';
-    const typeLabel = currentVenue.type === 'spa' ? '🛁 Spa' : currentVenue.type === 'wading_pool' ? '🏖 Wading Pool' : '🏊 Pool';
+    const typeLabel = currentVenue.type === 'spa' ? '🛁 Spa' : currentVenue.type === 'wading_pool' ? '🏖 Wading Pool' : currentVenue.type === 'catch_pool' ? '🌊 Catch Pool' : '🏊 Pool';
     text.innerHTML = `${typeLabel} &nbsp;·&nbsp; <span style="color:var(--yellow)">Manual Entry</span>`;
     return;
   }
@@ -1154,10 +1156,11 @@ function fillVolumeFields() {
   // ── Auto-select Venue Type ──
   // Turnover Time radio
   let toVal = 'pool_small';
-  if (type === 'spa')         toVal = vol < 10000 ? 'spa_small' : 'spa_large';
+  if (type === 'spa')              toVal = vol < 10000 ? 'spa_small' : 'spa_large';
   else if (type === 'wading_pool') toVal = 'wading';
   else if (type === 'therapy_pool') toVal = 'therapy';
-  else toVal = vol >= 200000 ? 'pool_large' : 'pool_small';
+  else if (type === 'catch_pool')  toVal = 'catch';
+  else                             toVal = vol >= 200000 ? 'pool_large' : 'pool_small';
   const toRadio = document.querySelector(`input[name="to_type"][value="${toVal}"]`);
   if (toRadio) toRadio.checked = true;
 
@@ -1166,6 +1169,7 @@ function fillVolumeFields() {
   if (type === 'spa')              mfVal = vol < 10000 ? '0.25' : '0.5';
   else if (type === 'wading_pool') mfVal = '0.5';
   else if (type === 'therapy_pool') mfVal = '0.5';
+  else if (type === 'catch_pool')  mfVal = '1';
   else                             mfVal = vol >= 200000 ? '5' : '4';
   const mfSel = document.getElementById('mf_type');
   if (mfSel) mfSel.value = mfVal;
@@ -1175,6 +1179,7 @@ function fillVolumeFields() {
   if (dpMaxTo) {
     if (type === 'spa')              dpMaxTo.value = vol < 10000 ? '0.25' : '0.5';
     else if (type === 'wading_pool') dpMaxTo.value = '0.5';
+    else if (type === 'catch_pool')  dpMaxTo.value = '1';
     else                             dpMaxTo.value = vol >= 200000 ? '5' : '4';
   }
 }
