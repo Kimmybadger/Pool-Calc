@@ -621,6 +621,10 @@
           <label for="to_wading">Wading Pool</label>
           <input type="radio" name="to_type" id="to_therapy" value="therapy">
           <label for="to_therapy">Therapy Pool</label>
+          <input type="radio" name="to_type" id="to_spa_s" value="spa_small">
+          <label for="to_spa_s">Spa &lt;10k gal</label>
+          <input type="radio" name="to_type" id="to_spa_l" value="spa_large">
+          <label for="to_spa_l">Spa ≥10k gal</label>
         </div>
       </div>
       <button class="calc-btn" onclick="calcTurnover()">CALCULATE TURNOVER</button>
@@ -665,6 +669,8 @@
             <option value="0.5">Therapy Pool (0.5 hr max)</option>
             <option value="1">Catch/Plunge Pool (1 hr max)</option>
             <option value="1">Water Slide (1 hr max)</option>
+            <option value="0.25">Spa &lt;10,000 gal (15 min max)</option>
+            <option value="0.5">Spa ≥10,000 gal (30 min max)</option>
           </select>
         </div>
       </div>
@@ -1278,7 +1284,7 @@ function calcVolume() {
 }
 
 // 02 Turnover
-const TURNOVER_MAX = { pool_small:4, pool_large:5, wading:0.5, therapy:0.5, catch:1, slide:1, spray:0.17, action_s:1, action_l:1.5, wave_s:1.5, wave_l:2 };
+const TURNOVER_MAX = { pool_small:4, pool_large:5, wading:0.5, therapy:0.5, catch:1, slide:1, spray:0.17, action_s:1, action_l:1.5, wave_s:1.5, wave_l:2, spa_small:0.25, spa_large:0.5 };
 function calcTurnover() {
   const vol = +document.getElementById('to_volume').value;
   const flow = +document.getElementById('to_flow').value;
