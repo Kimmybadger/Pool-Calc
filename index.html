@@ -636,9 +636,9 @@
       </div>
       <button class="calc-btn" onclick="calcDualPump()">CALCULATE</button>
       <div class="result-box" id="res-dualpump">
-        <div class="result-status" id="res-dp-status"></div>
-        <div class="result-main" id="res-dp-main"></div>
-        <div class="result-sub" id="res-dp-sub"></div>
+        <div class="result-status" id="res-dualpump-status"></div>
+        <div class="result-main" id="res-dualpump-main"></div>
+        <div class="result-sub" id="res-dualpump-sub"></div>
       </div>
     </div>
 
@@ -664,10 +664,10 @@
       </div>
       <button class="calc-btn" onclick="calcBromine()">CALCULATE BROMINE</button>
       <div class="result-box" id="res-bromine">
-        <div class="result-status" id="res-br-status"></div>
-        <div class="result-main" id="res-br-main"></div>
-        <div class="result-sub" id="res-br-sub"></div>
-        <div class="result-corrective" id="res-br-corr" style="display:none"></div>
+        <div class="result-status" id="res-bromine-status"></div>
+        <div class="result-main" id="res-bromine-main"></div>
+        <div class="result-sub" id="res-bromine-sub"></div>
+        <div class="result-corrective" id="res-bromine-corr" style="display:none"></div>
       </div>
     </div>
 
@@ -816,10 +816,10 @@
       </div>
       <button class="calc-btn" onclick="calcSpaTurnover()">CALCULATE</button>
       <div class="result-box" id="res-spaturnover">
-        <div class="result-status" id="res-st-status"></div>
-        <div class="result-main" id="res-st-main"></div>
-        <div class="result-sub" id="res-st-sub"></div>
-        <div class="result-corrective" id="res-st-corr" style="display:none"></div>
+        <div class="result-status" id="res-spaturnover-status"></div>
+        <div class="result-main" id="res-spaturnover-main"></div>
+        <div class="result-sub" id="res-spaturnover-sub"></div>
+        <div class="result-corrective" id="res-spaturnover-corr" style="display:none"></div>
       </div>
     </div>
 
@@ -846,10 +846,10 @@
       </div>
       <button class="calc-btn" onclick="calcBatherLoad()">CALCULATE</button>
       <div class="result-box" id="res-bather">
-        <div class="result-status" id="res-bl-status"></div>
-        <div class="result-main" id="res-bl-main"></div>
-        <div class="result-sub" id="res-bl-sub"></div>
-        <div class="result-corrective" id="res-bl-corr" style="display:none"></div>
+        <div class="result-status" id="res-bather-status"></div>
+        <div class="result-main" id="res-bather-main"></div>
+        <div class="result-sub" id="res-bather-sub"></div>
+        <div class="result-corrective" id="res-bather-corr" style="display:none"></div>
       </div>
     </div>
 
@@ -876,10 +876,10 @@
       </div>
       <button class="calc-btn" onclick="calcPressureDrop()">CALCULATE ΔP</button>
       <div class="result-box" id="res-pressuredrop">
-        <div class="result-status" id="res-pd-status"></div>
-        <div class="result-main" id="res-pd-main"></div>
-        <div class="result-sub" id="res-pd-sub"></div>
-        <div class="result-corrective" id="res-pd-corr" style="display:none"></div>
+        <div class="result-status" id="res-pressuredrop-status"></div>
+        <div class="result-main" id="res-pressuredrop-main"></div>
+        <div class="result-sub" id="res-pressuredrop-sub"></div>
+        <div class="result-corrective" id="res-pressuredrop-corr" style="display:none"></div>
       </div>
     </div>
 
@@ -916,10 +916,10 @@
       </div>
       <button class="calc-btn" onclick="calcFilterFlow()">CALCULATE</button>
       <div class="result-box" id="res-filterflow">
-        <div class="result-status" id="res-ff-status"></div>
-        <div class="result-main" id="res-ff-main"></div>
-        <div class="result-sub" id="res-ff-sub"></div>
-        <div class="result-corrective" id="res-ff-corr" style="display:none"></div>
+        <div class="result-status" id="res-filterflow-status"></div>
+        <div class="result-main" id="res-filterflow-main"></div>
+        <div class="result-sub" id="res-filterflow-sub"></div>
+        <div class="result-corrective" id="res-filterflow-corr" style="display:none"></div>
       </div>
       </div>
     </div>
@@ -1282,17 +1282,18 @@ function calcBreakpoint() {
   if (!tc||!fc) return alert('Please fill TC and FC fields.');
   const cc = tc - fc;
   if (cc < 0) { alert('TC cannot be less than FC.'); return; }
-  const doseNeeded = cc * 10; // mg/L chlorine needed
-  const box = document.getElementById('res-breakpoint');
-  box.className = 'result-box show ' + (cc > 0.2 ? 'fail' : 'pass');
-  document.getElementById('res-bp-status').textContent = cc > 0.2 ? '⚠ CHLORAMINES DETECTED' : '✓ WITHIN LIMIT';
-  document.getElementById('res-bp-main').textContent = `Add ${doseNeeded.toFixed(1)} mg/L Cl₂`;
+  const doseNeeded = cc * 10;
   let sub = `Combined Chlorine: <strong>${cc.toFixed(2)} mg/L</strong><br>Breakpoint dose needed: <strong>${doseNeeded.toFixed(1)} mg/L</strong>`;
   if (vol) {
     const lbs = (doseNeeded * vol * 8.34) / 1000000;
     sub += `<br>For ${vol.toLocaleString()} gal pool: ≈ <strong>${lbs.toFixed(2)} lbs</strong> of 100% Cl₂ equivalent`;
   }
-  document.getElementById('res-bp-sub').innerHTML = sub;
+  showResult('breakpoint',
+    cc > 0.2 ? 'fail' : 'pass',
+    cc > 0.2 ? '⚠ CHLORAMINES DETECTED' : '✓ WITHIN LIMIT',
+    `Add ${doseNeeded.toFixed(1)} mg/L Cl₂`,
+    sub, null
+  );
 }
 
 // 07 CYA
@@ -1422,8 +1423,8 @@ function calcPressureDrop() {
   if (!inf || !eff) return alert('Enter both influent and effluent pressures.');
   const dp = inf - eff;
   if (dp < 0) { alert('Influent pressure must be greater than effluent.'); return; }
-  let type, status, sub, corr = null;
-  sub = `Influent: <strong>${inf} psi</strong> &nbsp;·&nbsp; Effluent: <strong>${eff} psi</strong>`;
+  let type, status, corr = null;
+  let sub = `Influent: <strong>${inf} psi</strong> &nbsp;·&nbsp; Effluent: <strong>${eff} psi</strong>`;
   if (base) {
     const rise = dp - base;
     sub += `<br>Baseline ΔP: <strong>${base} psi</strong> &nbsp;·&nbsp; Rise from baseline: <strong>${rise.toFixed(1)} psi</strong>`;
@@ -1435,14 +1436,7 @@ function calcPressureDrop() {
     else if (dp >= 12) { type='warn'; status='⚠ ELEVATED ΔP'; }
     else { type='pass'; status='✓ NORMAL'; }
   }
-  const box = document.getElementById('res-pressuredrop');
-  box.className = 'result-box show ' + type;
-  document.getElementById('res-pd-status').textContent = status;
-  document.getElementById('res-pd-main').textContent = `ΔP = ${dp.toFixed(1)} psi`;
-  document.getElementById('res-pd-sub').innerHTML = sub;
-  const corrEl = document.getElementById('res-pd-corr');
-  corrEl.style.display = corr ? 'block' : 'none';
-  if (corrEl) corrEl.textContent = corr || '';
+  showResult('pressuredrop', type, status, `ΔP = ${dp.toFixed(1)} psi`, sub, corr);
 }
 
 // 13 Filter Flow/Area
