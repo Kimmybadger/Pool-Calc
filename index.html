@@ -1020,7 +1020,7 @@ let currentVenue = null;
 
 async function loadFacilities() {
   try {
-    const res = await fetch('./data/facilities.json');
+    const res = await fetch('./facilities.json');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     facilities = data.facilities || [];
