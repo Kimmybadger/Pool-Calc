@@ -1144,10 +1144,39 @@ function updateBadge() {
 function fillVolumeFields() {
   if (!currentVenue || currentVenue.volume_gal === 0) return;
   const vol = currentVenue.volume_gal;
+  const type = currentVenue.type;
+
   ['to_volume','mf_volume','dp_volume','bp_volume','sd_volume','st_volume'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = vol;
   });
+
+  // ── Auto-select Venue Type ──
+  // Turnover Time radio
+  let toVal = 'pool_small';
+  if (type === 'spa')         toVal = vol < 10000 ? 'spa_small' : 'spa_large';
+  else if (type === 'wading_pool') toVal = 'wading';
+  else if (type === 'therapy_pool') toVal = 'therapy';
+  else toVal = vol >= 200000 ? 'pool_large' : 'pool_small';
+  const toRadio = document.querySelector(`input[name="to_type"][value="${toVal}"]`);
+  if (toRadio) toRadio.checked = true;
+
+  // Min Flow Rate select
+  let mfVal = '4';
+  if (type === 'spa')              mfVal = vol < 10000 ? '0.25' : '0.5';
+  else if (type === 'wading_pool') mfVal = '0.5';
+  else if (type === 'therapy_pool') mfVal = '0.5';
+  else                             mfVal = vol >= 200000 ? '5' : '4';
+  const mfSel = document.getElementById('mf_type');
+  if (mfSel) mfSel.value = mfVal;
+
+  // Max Turnover field in Dual Pump
+  const dpMaxTo = document.getElementById('dp_max_to');
+  if (dpMaxTo) {
+    if (type === 'spa')              dpMaxTo.value = vol < 10000 ? '0.25' : '0.5';
+    else if (type === 'wading_pool') dpMaxTo.value = '0.5';
+    else                             dpMaxTo.value = vol >= 200000 ? '5' : '4';
+  }
 }
 
 // ══════════════════════════════════════════
