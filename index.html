@@ -522,7 +522,7 @@
       <span class="icon">🛁</span><span>Spa Drain Interval</span><span class="num">08</span>
     </button>
     <button class="tab-btn" onclick="showTab('spa-turnover')">
-      <span class="icon">♻️</span><span>Spa Turnover</span><span class="num">09</span>
+      <span class="icon">♻️</span><span>Spa Turnover (MAHC)</span><span class="num">09</span>
     </button>
 
     <div class="tab-group-label">Bather Load</div>
@@ -911,9 +911,9 @@
     <!-- 10 SPA TURNOVER -->
     <div class="calc-panel" id="panel-spa-turnover">
       <div class="panel-header">
-        <h2>Spa Turnover Time</h2>
-        <p>Checks spa turnover against TB MED 575 standard: &lt;10,000 gal = 15 min max; ≥10,000 gal = 30 min max.</p>
-        <span class="ref">TB MED 575 Table 2-2</span>
+        <h2>Spa Turnover Time <span style="font-size:13px;font-weight:500;color:var(--accent2)">(MAHC)</span></h2>
+        <p>Calculates required maximum turnover time based on water temperature and bather density. More precise than volume-only method.</p>
+        <span class="ref">MAHC Table 4.7.1.10</span>
       </div>
       <div class="form-grid">
         <div class="field">
@@ -923,6 +923,14 @@
         <div class="field">
           <label>Flow Rate (GPM)</label>
           <div class="field-row"><input type="number" id="st_flow" placeholder="e.g. 80"><span class="unit-label">GPM</span></div>
+        </div>
+        <div class="field">
+          <label>Water Temperature (°F)</label>
+          <div class="field-row"><input type="number" id="st_temp" placeholder="e.g. 102" step="0.5"><span class="unit-label">°F</span></div>
+        </div>
+        <div class="field">
+          <label>Current Bathers</label>
+          <div class="field-row"><input type="number" id="st_bathers" placeholder="e.g. 6"><span class="unit-label">ppl</span></div>
         </div>
       </div>
       <button class="calc-btn" onclick="calcSpaTurnover()">CALCULATE</button>
@@ -934,11 +942,15 @@
         <div class="result-corrective" id="res-spaturnover-corr" style="display:none"></div>
       </div>
       <div class="ref-box">
-        <div class="ref-box-title">📋 TB MED 575 Table 2-2 — Spa Turnover Standards</div>
+        <div class="ref-box-title">📋 MAHC Table 4.7.1.10 — Spa Turnover Standards</div>
         <ul>
-          <li><strong>Spa &lt;10,000 gal:</strong> 0.25 hr (15 min) max</li>
-          <li><strong>Spa ≥10,000 gal:</strong> 0.5 hr (30 min) max</li>
-          <li><strong>Formula:</strong> Volume (gal) ÷ Flow (GPM) = Minutes</li>
+          <li><strong>왜 스파는 별도 기준인가?</strong> 스파는 고온으로 인해 이용자의 발한량이 증가하고, 단위 부피당 이용자 밀도가 높아 유기물 오염 부하가 일반 풀보다 훨씬 크기 때문에 별도 기준 적용.</li>
+          <li><strong>≥93–104°F (모든 밀도):</strong> 0.5 hr max — 고온에서는 밀도와 무관하게 30분 이내 순환 필수</li>
+          <li><strong>72–93°F, &gt;2,500 gal/person:</strong> 4 hr max — 저밀도 저온 스파</li>
+          <li><strong>72–93°F, 450–2,500 gal/person:</strong> 2 hr max — 중간 밀도</li>
+          <li><strong>72–93°F, ≤450 gal/person:</strong> 1 hr max — 고밀도 저온 스파</li>
+          <li><strong>gal/person 계산:</strong> 스파 용량 ÷ 현재 이용자 수</li>
+          <li><strong>TB MED 575와의 차이:</strong> TB MED 575는 단순 볼륨 기준(&lt;10,000 gal = 15분), MAHC는 실제 운영 조건(온도+밀도) 반영으로 더 정밀함</li>
         </ul>
       </div>
     </div>
@@ -1530,21 +1542,50 @@ function calcSpaDrain() {
      Maximum interval: <strong>${days.toFixed(1)} days</strong> between full drains &amp; refills.`;
 }
 
-// 10 Spa Turnover
+// 10 Spa Turnover (MAHC)
 function calcSpaTurnover() {
-  const vol = +document.getElementById('st_volume').value;
+  const vol  = +document.getElementById('st_volume').value;
   const flow = +document.getElementById('st_flow').value;
-  if (!vol||!flow) return alert('Please fill all fields.');
-  const actualMin = vol / flow;
-  const maxMin = vol < 10000 ? 15 : 30;
-  const pass = actualMin <= maxMin;
+  const temp = +document.getElementById('st_temp').value;
+  const bathers = +document.getElementById('st_bathers').value;
+  if (!vol || !flow) return alert('Please enter Spa Volume and Flow Rate.');
+  if (!temp)    return alert('Please enter Water Temperature.');
+  if (!bathers) return alert('Please enter Current Bathers.');
+
+  const actualMin = vol / flow;           // actual turnover in minutes
+  const actualHr  = actualMin / 60;
+
+  // ── MAHC max turnover determination ──
+  let maxHr, criterion;
+  if (temp >= 93) {
+    maxHr = 0.5;
+    criterion = `≥93°F → 0.5 hr max (all densities)`;
+  } else {
+    const galPerPerson = vol / bathers;
+    if (galPerPerson > 2500) {
+      maxHr = 4;
+      criterion = `72–93°F, ${galPerPerson.toFixed(0)} gal/person &gt;2,500 → 4 hr max`;
+    } else if (galPerPerson > 450) {
+      maxHr = 2;
+      criterion = `72–93°F, ${galPerPerson.toFixed(0)} gal/person 450–2,500 → 2 hr max`;
+    } else {
+      maxHr = 1;
+      criterion = `72–93°F, ${galPerPerson.toFixed(0)} gal/person ≤450 → 1 hr max`;
+    }
+  }
+
+  const pass = actualHr <= maxHr;
+  const galPerPerson = (vol / bathers).toFixed(0);
+
   showResult('spaturnover',
     pass ? 'pass' : 'fail',
-    pass ? '✓ PASS' : '✗ FAIL',
-    `${actualMin.toFixed(1)} min`,
-    `Required max: <strong>${maxMin} min</strong> (spa ${vol < 10000 ? '<' : '≥'} 10,000 gal)<br>
+    pass ? '✓ PASS (MAHC)' : '✗ FAIL (MAHC)',
+    `${actualMin.toFixed(1)} min (${actualHr.toFixed(2)} hr)`,
+    `Required max: <strong>${maxHr} hr (${maxHr * 60} min)</strong><br>
+     Criterion: <strong>${criterion}</strong><br>
+     Density: <strong>${galPerPerson} gal/person</strong> &nbsp;·&nbsp; Temp: <strong>${temp}°F</strong><br>
      Flow: <strong>${flow} GPM</strong> &nbsp;·&nbsp; Volume: <strong>${vol.toLocaleString()} gal</strong>`,
-    pass ? null : `Increase spa flow rate to at least ${Math.ceil(vol / maxMin)} GPM to achieve ${maxMin}-minute turnover.`
+    pass ? null : `Current turnover (${actualMin.toFixed(1)} min) exceeds MAHC maximum (${maxHr * 60} min). Increase flow rate to at least ${Math.ceil(vol / maxHr / 60)} GPM.`
   );
 }
 
