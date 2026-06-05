@@ -1193,6 +1193,14 @@ function fillVolumeFields() {
     else if (type === 'activity_pool') dpMaxTo.value = vol < 100000 ? '1' : '1.5';
     else                              dpMaxTo.value = vol >= 200000 ? '5' : '4';
   }
+
+  // ── Auto-select Bromine Venue Type ──
+  const brVenue = document.getElementById('br_venue_type');
+  if (brVenue) {
+    if (type === 'spa')                              brVenue.value = 'spa';
+    else if (currentVenue.location === 'outdoor')   brVenue.value = 'outdoor';
+    else                                             brVenue.value = 'pool_indoor';
+  }
 }
 
 // ══════════════════════════════════════════
