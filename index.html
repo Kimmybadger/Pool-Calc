@@ -667,12 +667,12 @@
           <select id="mf_type" style="width:100%">
             <option value="4">Pool &lt;200,000 gal (4 hr max)</option>
             <option value="5">Pool ≥200,000 gal (5 hr max)</option>
-            <option value="0.5">Wading Pool (0.5 hr max)</option>
-            <option value="0.5">Therapy Pool (0.5 hr max)</option>
-            <option value="1">Catch/Plunge Pool (1 hr max)</option>
-            <option value="1">Water Slide (1 hr max)</option>
+            <option value="0.5_wading">Wading Pool (0.5 hr max)</option>
+            <option value="0.5_therapy">Therapy Pool (0.5 hr max)</option>
+            <option value="1_catch">Catch/Plunge Pool (1 hr max)</option>
+            <option value="1_slide">Water Slide (1 hr max)</option>
             <option value="0.25">Spa &lt;10,000 gal (15 min max)</option>
-            <option value="0.5">Spa ≥10,000 gal (30 min max)</option>
+            <option value="0.5_spa_l">Spa ≥10,000 gal (30 min max)</option>
           </select>
         </div>
       </div>
@@ -1166,11 +1166,11 @@ function fillVolumeFields() {
 
   // Min Flow Rate select
   let mfVal = '4';
-  if (type === 'spa')              mfVal = vol < 10000 ? '0.25' : '0.5';
-  else if (type === 'wading_pool') mfVal = '0.5';
-  else if (type === 'therapy_pool') mfVal = '0.5';
-  else if (type === 'catch_pool')  mfVal = '1';
-  else                             mfVal = vol >= 200000 ? '5' : '4';
+  if (type === 'spa')               mfVal = vol < 10000 ? '0.25' : '0.5_spa_l';
+  else if (type === 'wading_pool')  mfVal = '0.5_wading';
+  else if (type === 'therapy_pool') mfVal = '0.5_therapy';
+  else if (type === 'catch_pool')   mfVal = '1_catch';
+  else                              mfVal = vol >= 200000 ? '5' : '4';
   const mfSel = document.getElementById('mf_type');
   if (mfSel) mfSel.value = mfVal;
 
@@ -1339,7 +1339,8 @@ function calcTurnover() {
 // 03 Min Flow Rate
 function calcMinFlow() {
   const vol = +document.getElementById('mf_volume').value;
-  const maxHr = +document.getElementById('mf_type').value;
+  const rawVal = document.getElementById('mf_type').value;
+  const maxHr = parseFloat(rawVal);  // handles "0.5_wading" → 0.5, "4" → 4
   if (!vol) return alert('Please enter pool volume.');
   const minGPM = Math.ceil(vol / maxHr / 60);
   const box = document.getElementById('res-minflow');
