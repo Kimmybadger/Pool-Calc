@@ -774,7 +774,8 @@
         <ul>
           <li><strong>Indoor Pool (min):</strong> 3.0 mg/L</li>
           <li><strong>Indoor Pool (max):</strong> 4.0 mg/L</li>
-          <li><strong>Spa (min):</strong> 6.0 mg/L</li>
+          <li><strong>Spa (min):</strong> 6.0 mg/L (no maximum specified in TB MED 575)</li>
+          <li><strong>Spa (max):</strong> 8.0 mg/L (EPA registered use concentration limit)</li>
           <li><strong>Outdoor Pool:</strong> Not permitted (UV degrades bromine)</li>
           <li><strong>Conversion:</strong> TC (DPD) × 2.25 = Total Bromine</li>
           <li><strong>Feed method:</strong> Solid-stick or tablet-type, NSF-certified equipment</li>
@@ -1423,16 +1424,23 @@ function calcBromine() {
   const br = tc * 2.25;
 
   if (venueType === 'spa') {
-    // Spa: min 6.0 mg/L (no max specified in TB MED 575)
     const min = 6.0;
-    const pass = br >= min;
-    showResult('bromine',
-      pass ? 'pass' : 'fail',
-      pass ? '✓ PASS — SPA' : '✗ FAIL — SPA',
+    const epaMax = 8.0;
+    let type, status, corr = null;
+    if (br < min) {
+      type = 'fail'; status = '✗ FAIL — SPA';
+      corr = `Spa bromine below minimum. Current: ${br.toFixed(2)} mg/L — Deficit: ${(min - br).toFixed(2)} mg/L. Increase bromine feed immediately.`;
+    } else if (br > epaMax) {
+      type = 'warn'; status = '⚠ EXCEEDS EPA LIMIT — SPA';
+      corr = `Spa bromine exceeds EPA maximum of 8.0 mg/L. Current: ${br.toFixed(2)} mg/L. Do not allow bather entry. Reduce feed rate and retest.`;
+    } else {
+      type = 'pass'; status = '✓ PASS — SPA';
+    }
+    showResult('bromine', type, status,
       `${br.toFixed(2)} mg/L Total Bromine`,
       `TC reading: <strong>${tc} mg/L</strong> × 2.25 = <strong>${br.toFixed(2)} mg/L Br</strong><br>
-       Spa minimum: <strong>6.0 mg/L</strong>`,
-      pass ? null : `Spa bromine below minimum. Current: ${br.toFixed(2)} mg/L — Deficit: ${(min - br).toFixed(2)} mg/L. Increase bromine feed immediately.`
+       Spa range: <strong>6.0 – 8.0 mg/L</strong> (min: TB MED 575 / max: EPA)`,
+      corr
     );
   } else {
     // Indoor Pool: min 3.0 mg/L, max 4.0 mg/L
