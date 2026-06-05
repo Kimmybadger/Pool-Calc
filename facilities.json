@@ -55,7 +55,7 @@
         {
           "id": "outdoor_activity",
           "name": "Activity Pool",
-          "type": "catch_pool",
+          "type": "activity_pool",
           "location": "outdoor",
           "volume_gal": 64500,
           "pump_count": 1,

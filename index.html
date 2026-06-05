@@ -627,6 +627,10 @@
           <label for="to_spa_l">Spa ≥10k gal</label>
           <input type="radio" name="to_type" id="to_catch" value="catch">
           <label for="to_catch">Catch/Plunge Pool</label>
+          <input type="radio" name="to_type" id="to_activity_s" value="activity_s">
+          <label for="to_activity_s">Activity Pool &lt;100k gal</label>
+          <input type="radio" name="to_type" id="to_activity_l" value="activity_l">
+          <label for="to_activity_l">Activity Pool ≥100k gal</label>
         </div>
       </div>
       <button class="calc-btn" onclick="calcTurnover()">CALCULATE TURNOVER</button>
@@ -645,6 +649,8 @@
           <li><strong>Wading Pool</strong> → 0.5 hr</li>
           <li><strong>Therapy Pool</strong> → 0.5 hr</li>
           <li><strong>Catch/Plunge Pool</strong> → 1 hr</li>
+          <li><strong>Activity Pool &lt;100,000 gal</strong> → 1 hr</li>
+          <li><strong>Activity Pool ≥100,000 gal</strong> → 1.5 hr</li>
           <li><strong>Spray Pad</strong> → 0.17 hr (10 min)</li>
         </ul>
       </div>
@@ -670,6 +676,8 @@
             <option value="0.5_wading">Wading Pool (0.5 hr max)</option>
             <option value="0.5_therapy">Therapy Pool (0.5 hr max)</option>
             <option value="1_catch">Catch/Plunge Pool (1 hr max)</option>
+            <option value="1_activity">Activity Pool &lt;100,000 gal (1 hr max)</option>
+            <option value="1.5_activity">Activity Pool ≥100,000 gal (1.5 hr max)</option>
             <option value="1_slide">Water Slide (1 hr max)</option>
             <option value="0.25">Spa &lt;10,000 gal (15 min max)</option>
             <option value="0.5_spa_l">Spa ≥10,000 gal (30 min max)</option>
@@ -1080,7 +1088,7 @@ function onFacilityChange() {
   facility.venues.forEach(v => {
     const opt = document.createElement('option');
     opt.value = v.id;
-    const typeLabel = v.type === 'spa' ? '🛁' : v.type === 'wading_pool' ? '🏖' : v.type === 'catch_pool' ? '🌊' : '🏊';
+    const typeLabel = v.type === 'spa' ? '🛁' : v.type === 'wading_pool' ? '🏖' : v.type === 'catch_pool' ? '🌊' : v.type === 'activity_pool' ? '🎯' : '🏊';
     opt.textContent = `${typeLabel} ${v.name}`;
     venueSel.appendChild(opt);
   });
@@ -1132,7 +1140,7 @@ function updateBadge() {
   }
   if (currentVenue.manual) {
     badge.className = 'venue-badge loaded';
-    const typeLabel = currentVenue.type === 'spa' ? '🛁 Spa' : currentVenue.type === 'wading_pool' ? '🏖 Wading Pool' : currentVenue.type === 'catch_pool' ? '🌊 Catch Pool' : '🏊 Pool';
+    const typeLabel = currentVenue.type === 'spa' ? '🛁 Spa' : currentVenue.type === 'wading_pool' ? '🏖 Wading Pool' : currentVenue.type === 'catch_pool' ? '🌊 Catch Pool' : currentVenue.type === 'activity_pool' ? '🎯 Activity Pool' : '🏊 Pool';
     text.innerHTML = `${typeLabel} &nbsp;·&nbsp; <span style="color:var(--yellow)">Manual Entry</span>`;
     return;
   }
@@ -1156,11 +1164,12 @@ function fillVolumeFields() {
   // ── Auto-select Venue Type ──
   // Turnover Time radio
   let toVal = 'pool_small';
-  if (type === 'spa')              toVal = vol < 10000 ? 'spa_small' : 'spa_large';
-  else if (type === 'wading_pool') toVal = 'wading';
+  if (type === 'spa')               toVal = vol < 10000 ? 'spa_small' : 'spa_large';
+  else if (type === 'wading_pool')  toVal = 'wading';
   else if (type === 'therapy_pool') toVal = 'therapy';
-  else if (type === 'catch_pool')  toVal = 'catch';
-  else                             toVal = vol >= 200000 ? 'pool_large' : 'pool_small';
+  else if (type === 'catch_pool')   toVal = 'catch';
+  else if (type === 'activity_pool') toVal = vol < 100000 ? 'activity_s' : 'activity_l';
+  else                              toVal = vol >= 200000 ? 'pool_large' : 'pool_small';
   const toRadio = document.querySelector(`input[name="to_type"][value="${toVal}"]`);
   if (toRadio) toRadio.checked = true;
 
@@ -1170,6 +1179,7 @@ function fillVolumeFields() {
   else if (type === 'wading_pool')  mfVal = '0.5_wading';
   else if (type === 'therapy_pool') mfVal = '0.5_therapy';
   else if (type === 'catch_pool')   mfVal = '1_catch';
+  else if (type === 'activity_pool') mfVal = vol < 100000 ? '1_activity' : '1.5_activity';
   else                              mfVal = vol >= 200000 ? '5' : '4';
   const mfSel = document.getElementById('mf_type');
   if (mfSel) mfSel.value = mfVal;
@@ -1177,10 +1187,11 @@ function fillVolumeFields() {
   // Max Turnover field in Dual Pump
   const dpMaxTo = document.getElementById('dp_max_to');
   if (dpMaxTo) {
-    if (type === 'spa')              dpMaxTo.value = vol < 10000 ? '0.25' : '0.5';
-    else if (type === 'wading_pool') dpMaxTo.value = '0.5';
-    else if (type === 'catch_pool')  dpMaxTo.value = '1';
-    else                             dpMaxTo.value = vol >= 200000 ? '5' : '4';
+    if (type === 'spa')               dpMaxTo.value = vol < 10000 ? '0.25' : '0.5';
+    else if (type === 'wading_pool')  dpMaxTo.value = '0.5';
+    else if (type === 'catch_pool')   dpMaxTo.value = '1';
+    else if (type === 'activity_pool') dpMaxTo.value = vol < 100000 ? '1' : '1.5';
+    else                              dpMaxTo.value = vol >= 200000 ? '5' : '4';
   }
 }
 
@@ -1318,7 +1329,7 @@ function calcVolume() {
 }
 
 // 02 Turnover
-const TURNOVER_MAX = { pool_small:4, pool_large:5, wading:0.5, therapy:0.5, catch:1, slide:1, spray:0.17, action_s:1, action_l:1.5, wave_s:1.5, wave_l:2, spa_small:0.25, spa_large:0.5 };
+const TURNOVER_MAX = { pool_small:4, pool_large:5, wading:0.5, therapy:0.5, catch:1, slide:1, spray:0.17, action_s:1, action_l:1.5, wave_s:1.5, wave_l:2, spa_small:0.25, spa_large:0.5, activity_s:1, activity_l:1.5 };
 function calcTurnover() {
   const vol = +document.getElementById('to_volume').value;
   const flow = +document.getElementById('to_flow').value;
