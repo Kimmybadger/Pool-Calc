@@ -1,0 +1,148 @@
+{
+  "facilities": [
+    {
+      "id": "cac",
+      "name": "CAC",
+      "venues": [
+        {
+          "id": "cac_pool",
+          "name": "CAC Pool",
+          "type": "pool",
+          "location": "indoor",
+          "volume_gal": 187775,
+          "pump_count": 1,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "collier",
+      "name": "Collier Gym",
+      "venues": [
+        {
+          "id": "collier_pool",
+          "name": "Pool",
+          "type": "pool",
+          "location": "indoor",
+          "volume_gal": 164422,
+          "pump_count": 1,
+          "note": ""
+        },
+        {
+          "id": "collier_spa",
+          "name": "Spa",
+          "type": "spa",
+          "location": "indoor",
+          "volume_gal": 2160,
+          "pump_count": 1,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "outdoor",
+      "name": "Outdoor Pool Complex",
+      "venues": [
+        {
+          "id": "outdoor_lap",
+          "name": "Lap Pool",
+          "type": "pool",
+          "location": "outdoor",
+          "volume_gal": 760500,
+          "pump_count": 1,
+          "note": ""
+        },
+        {
+          "id": "outdoor_activity",
+          "name": "Activity Pool",
+          "type": "catch_pool",
+          "location": "outdoor",
+          "volume_gal": 64500,
+          "pump_count": 1,
+          "note": ""
+        },
+        {
+          "id": "outdoor_wading",
+          "name": "Wading Pool",
+          "type": "wading_pool",
+          "location": "outdoor",
+          "volume_gal": 41200,
+          "pump_count": 1,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "tsak",
+      "name": "TSAK",
+      "venues": [
+        {
+          "id": "tsak_pool",
+          "name": "TSAK Pool",
+          "type": "pool",
+          "location": "indoor",
+          "volume_gal": 244000,
+          "pump_count": 1,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "k16",
+      "name": "K-16",
+      "venues": [
+        {
+          "id": "k16_pool",
+          "name": "K-16 Pool",
+          "type": "pool",
+          "location": "indoor",
+          "volume_gal": 80000,
+          "pump_count": 1,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "yongsan_point",
+      "name": "Yongsan Point Pool",
+      "venues": [
+        {
+          "id": "point_main_pool",
+          "name": "Main Pool",
+          "type": "pool",
+          "location": "indoor",
+          "volume_gal": 98000,
+          "pump_count": 1,
+          "note": ""
+        },
+        {
+          "id": "point_main_spa",
+          "name": "Main Spa",
+          "type": "spa",
+          "location": "indoor",
+          "volume_gal": 1920,
+          "pump_count": 1,
+          "note": ""
+        },
+        {
+          "id": "point_male_spa",
+          "name": "Male Spa",
+          "type": "spa",
+          "location": "indoor",
+          "volume_gal": 660,
+          "pump_count": 1,
+          "note": ""
+        },
+        {
+          "id": "point_female_spa",
+          "name": "Female Spa",
+          "type": "spa",
+          "location": "indoor",
+          "volume_gal": 660,
+          "pump_count": 1,
+          "note": ""
+        }
+      ]
+    }
+  ]
+}
